@@ -62,7 +62,7 @@ Seriously.
 Early Stage
 -----------
 
-Right now, you need to run XD.R.Y. for the command line, and it just prints the generated source code.
+Right now, you need to run XD.R.Y. for the command line. The generated source code is saved into `xdry.m`.
 You then hunt down the snippet you want in the giant pile of output. Yeah, I know. Duh.
 
 Everything that XD.R.Y. can generate for now is illustrated in the above snippet. Nothing else is supported.

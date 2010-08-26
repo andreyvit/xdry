@@ -124,39 +124,30 @@ module XDry
     end
   end
 
-  def self.run
-    oglobal = OGlobal.new
-
-    Dir["**/*.m"].each do |m_file|
-      h_file = m_file.sub /\.m$/, '.h'
-      if File.file? h_file
-        puts h_file
-
-        parser = Parser.new(oglobal)
-        parser.parse_header(h_file)
-        # parser.parse_header(m_file)
-      end
-    end
-
-    puts
+  def self.produce_everything out_file, oglobal
+    puts "Generating code... "
     oglobal.classes.each do |oclass|
-      puts
-      puts "#{oclass}"
+      puts "  - #{oclass.name}"
 
       out = Emitter.new
 
+      if DEBUG
+        oclass.attributes.each do |oattr|
+          puts "      #{oattr}"
+        end
+
+        oclass.methods.each do |omethod|
+          puts "      #{omethod}" if DEBUG
+        end
+      end
+
       oclass.attributes.each do |oattr|
-        puts "  #{oattr}"
         unless oattr.has_field_def?
           out << oattr.new_field_def.to_source
         end
         unless oattr.has_property_def?
           out << oattr.new_property_def.to_source
         end
-      end
-
-      oclass.methods.each do |omethod|
-        puts "  #{omethod}"
       end
 
       if oclass.attributes.any? { |a| a.persistent? }
@@ -173,10 +164,37 @@ module XDry
       add_dealloc out, oclass
 
       unless out.empty?
-        puts
-        puts out.to_s
+        out_file.puts
+        out_file.puts
+        out_file.puts "/" * 79
+        out_file.puts "@implementation #{oclass.name}"
+        out_file.puts
+        out_file.puts out.to_s
+        out_file.puts
+        out_file.puts "@end"
       end
     end
+  end
+
+  def self.run
+    oglobal = OGlobal.new
+
+    Dir["**/*.m"].each do |m_file|
+      h_file = m_file.sub /\.m$/, '.h'
+      if File.file? h_file
+        puts h_file if DEBUG
+
+        parser = Parser.new(oglobal)
+        parser.parse_header(h_file)
+        # parser.parse_header(m_file)
+      end
+    end
+
+    out_file_name = 'xdry.m'
+    open(out_file_name, 'w') do |out_file|
+      self.produce_everything(out_file, oglobal)
+    end
+    puts "See #{out_file_name}."
   end
 
 end

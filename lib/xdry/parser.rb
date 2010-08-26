@@ -37,14 +37,14 @@ module XDry
       state = SGlobal.new(@oglobal, nil)
       while gen.next?
         orig_line, line, eol_comments = gen.next
-        puts "        #{orig_line}"
+        puts "        #{orig_line}" if DEBUG
         state.process_header_line!(line, eol_comments) do |something|
           case something
           when State
-            puts "#{state} --> #{something}"
+            puts "#{state} --> #{something}" if DEBUG
             state = something
           when Fragment
-            puts "#{state.context} << #{something}"
+            puts "#{state.context} << #{something}" if DEBUG
             state.add! something
           else
             raise StandardError, "Shit emitted from process_header_line! (#{something.class.name}) for line '#{line}'"

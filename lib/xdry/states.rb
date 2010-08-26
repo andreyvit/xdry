@@ -25,10 +25,8 @@ module XDry
       case line
         when /^@interface\s+(\w+)\s*;/
           name = $1
-          puts "PREDEF interface #{name}"
         when /^@protocol\s+(\w+)\s*;/
           name = $1
-          puts "PREDEF protocol #{name}"
 
         when /^@interface\s+(\w+)/  #\s*(?:[:(][\w:(),\s]*)?
           name, supers, postfix = $1, $2, $'
@@ -105,8 +103,6 @@ module XDry
         selector_def = OSelectorDef.parse(selector_decl)
         ret_type = OVarType.parse(ret_type_decl)
         yield OMethodHeader.new(selector_def, ret_type)
-      else
-        puts "Unparsed: #{line}"
       end
     end
 
