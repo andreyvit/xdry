@@ -130,7 +130,7 @@ module XDry
 
     POINTER_CONVERTIONS = {
       'NSDate' => DateConverter.new,
-      'NSString' => NopConverter.new,
+      'NSString' => StringConverter.new,
     }
 
     def self.converter_for type
