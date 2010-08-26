@@ -1,6 +1,8 @@
 module XDry
 
   class Emitter
+    attr_reader :lines
+
     def initialize
       @lines = []
       @indent = "    "
@@ -8,7 +10,12 @@ module XDry
     end
 
     def << line
-      @lines << @current_indent + line
+      case line
+      when Emitter
+        @lines.push *line.lines.collect { |l| @current_indent + l }
+      else
+        @lines << @current_indent + line
+      end
     end
 
     def indent

@@ -17,19 +17,19 @@ module XDry
   end
 
   class OClass
-    attr_reader :name, :field_defs, :attributes
+    attr_reader :name, :field_defs, :attributes, :methods
 
     def initialize oglobal, name
       @oglobal, @name = oglobal, name
 
       @names_to_attributes = {}
       @attributes = []
+
+      @selectors_to_methods = {}
+      @methods = []
+
       @field_defs = []
       @property_defs = []
-    end
-
-    def lookup_attribute name
-      @names_to_attributes[name] ||= create_attribute(name)
     end
 
     def add! fragment
@@ -42,6 +42,9 @@ module XDry
         @property_defs << fragment
         attr_name = fragment.name
         lookup_attribute(attr_name).add_property_def! fragment
+      when OMethodHeader
+        selector = fragment.selector
+        lookup_method(selector).add_method_header! fragment
       else
         raise StandardError, "Unknown fragment: #{fragment}"
       end
@@ -51,13 +54,36 @@ module XDry
       "class #{name}"
     end
 
+    def find_attribute name
+      @names_to_attributes[name]
+    end
+
+    def find_method selector
+      @selectors_to_methods[name]
+    end
+
   private
+
+    def lookup_attribute name
+      @names_to_attributes[name] ||= create_attribute(name)
+    end
+
+    def lookup_method selector
+      @selectors_to_methods[selector] ||= create_method(selector)
+    end
 
     def create_attribute name
       a = OAttribute.new(self, name)
       @attributes << a
       return a
     end
+
+    def create_method selector
+      a = OMethod.new(selector)
+      @methods << a
+      return a
+    end
+
   end
 
   class OAttribute
@@ -115,6 +141,28 @@ module XDry
     def to_s
       "#{type} #{name}"
     end
+  end
+
+  class OMethod
+    attr_reader :selector, :header
+
+    def initialize selector
+      @selector = selector
+      @header, @implementation = nil, nil
+    end
+
+    def add_method_header! method_header
+      @header = method_header
+    end
+
+    def ret_type
+      @header.ret_type
+    end
+
+    def to_s
+      @header.to_s
+    end
+
   end
 
 end

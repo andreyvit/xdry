@@ -21,7 +21,7 @@ module XDry
 
   class SGlobal < State
 
-    def process_header_line! line
+    def process_header_line! line, eol_comments
       case line
         when /^@interface\s+(\w+)\s*;/
           name = $1
@@ -55,7 +55,7 @@ module XDry
       @tags = Set.new
     end
 
-    def process_header_line! line
+    def process_header_line! line, eol_comments
       case line
       when /\}/
         yield @parent_state
@@ -65,17 +65,32 @@ module XDry
         @tags.clear
       when /^(\w+)\s+(\w+)\s*;/
         type_name, field_name = $1, $2
-        yield OFieldDef.new(field_name, OSimpleVarType.new(type_name)).with_tags(@tags.to_a)
+        yield process_type_hint(OFieldDef.new(field_name, OSimpleVarType.new(type_name)), eol_comments)
       when /^(\w+)\s*\*\s*(\w+)\s*;/
         type_name, field_name = $1, $2
-        yield OFieldDef.new(field_name, OPointerVarType.new(type_name)).with_tags(@tags.to_a)
+        yield process_type_hint(OFieldDef.new(field_name, OPointerVarType.new(type_name)), eol_comments)
       end
+    end
+
+  private
+
+    def process_type_hint field_def, eol_comments
+      field_def.tags = @tags.to_a
+
+      case field_def.type.name
+      when 'NSArray'
+        if eol_comments =~ %r`//\s*of\s+(\w+)`
+          field_def.type.type_hint = $1
+        end
+      end
+
+      field_def
     end
   end
 
   class SInterfaceHeader < State
 
-    def process_header_line! line
+    def process_header_line! line, eol_comments
       case line
       when /@end/
         yield @parent_state
@@ -85,6 +100,13 @@ module XDry
       when /^@property(\s*\([\w\s,]*\))?\s+(IBOutlet\s+)?(\w+)\s+(\w+)\s*;$/
         property_flags, iboutlet, type_name, property_name = $1, $2, $3, $4
         yield OPropertyDef.new(property_name, OSimpleVarType.new(type_name))
+      when /^-\s*\(([^)]+)\)\s*(\w+[\w\s():*]*);$/
+        ret_type_decl, selector_decl = $1, $2
+        selector_def = OSelectorDef.parse(selector_decl)
+        ret_type = OVarType.parse(ret_type_decl)
+        yield OMethodHeader.new(selector_def, ret_type)
+      else
+        puts "Unparsed: #{line}"
       end
     end
 
