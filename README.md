@@ -42,7 +42,7 @@ produces stuff like
         return self;
     }
 
-    - (id)dealloc {
+    - (void)dealloc {
         [_uid release], _uid = nil;
         [_displayName release], _displayName = nil;
         [super dealloc];

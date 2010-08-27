@@ -117,7 +117,7 @@ module XDry
     end
 
     unless dealloc_out.empty?
-      out.method "(id)dealloc" do
+      out.method "(void)dealloc" do
         out << dealloc_out
         out << "[super dealloc];"
       end
@@ -141,14 +141,19 @@ module XDry
         end
       end
 
+      synthesize_out = Emitter.new
       oclass.attributes.each do |oattr|
         unless oattr.has_field_def?
           out << oattr.new_field_def.to_source
+          oattr.add_field_def! oattr.new_field_def
         end
         unless oattr.has_property_def?
           out << oattr.new_property_def.to_source
         end
+        synthesize_out << "@synthesize #{oattr.name}=#{oattr.field_name};"
       end
+
+      out << synthesize_out
 
       if oclass.attributes.any? { |a| a.persistent? }
         add_persistence out, oclass
