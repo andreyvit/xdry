@@ -286,18 +286,20 @@ module XDry
     if config.watch
       require 'rubygems'
       require 'fssm'
-      rebuild = lambda do
-        changed_file_refs = run_once(config)
-        unless changed_file_refs.empty?
-          system "growlnotify", "-a", "Xcode", "-t", "XD.R.Y.", "-m", "Updating..."
-          system "osascript", "-e", '
-            tell application "Finder" to activate
-            delay 0.3
-            tell application "Xcode" to activate
-            delay 0.5
-            tell application "System Events" to keystroke "u" using {command down}
-          '
-          system "growlnotify", "-a", "Xcode", "-t", "XD.R.Y.", "-m", "Updated!"
+      rebuild = lambda do |base, relative|
+        unless File.basename(relative) == 'xdry.m'
+          changed_file_refs = run_once(config)
+          unless changed_file_refs.empty?
+            system "growlnotify", "-a", "Xcode", "-t", "XD.R.Y.", "-m", "Updating..."
+            system "osascript", "-e", '
+              tell application "Finder" to activate
+              delay 0.3
+              tell application "Xcode" to activate
+              delay 0.5
+              tell application "System Events" to keystroke "u" using {command down}
+            '
+            system "growlnotify", "-a", "Xcode", "-t", "XD.R.Y.", "-m", "Updated!"
+          end
         end
       end
       puts
