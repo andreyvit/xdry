@@ -115,4 +115,57 @@ module XDry
   class NEnd < Node
   end
 
+  class SynthesizeItem
+
+    attr_reader :property_name, :field_name
+
+    def initialize property_name, field_name = nil
+      @property_name, @field_name = property_name, field_name
+    end
+
+    def has_field_name?
+      not @field_name.nil?
+    end
+
+    def to_s
+      if has_field_name?
+        "#{property_name}=#{field_name}"
+      else
+        "#{property_name}"
+      end
+    end
+
+    def self.parse string
+      case string
+        when /^(\w+)$/             then SynthesizeItem.new($1, nil)
+        when /^(\w+)\s*=\s*(\w+)$/ then SynthesizeItem.new($1, $2)
+      end
+    end
+
+  end
+
+  class NSynthesize < Node
+
+    attr_reader :items
+
+    def initialize items
+      @items = items
+    end
+
+    def item_for_property_named property_name
+      @items.find { |item| item.property_name == property_name }
+    end
+
+    def to_s
+      "@synthesize " + @items.join(", ") + ";"
+    end
+
+    def self.parse string
+      if string =~ /^@synthesize\s+(.*);$/
+        NSynthesize.new($1.strip.split(/\s+,\s+/).collect { |s| SynthesizeItem.parse(s) }.compact)
+      end
+    end
+
+  end
+
 end

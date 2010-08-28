@@ -8,6 +8,9 @@ module XDry
 
     def initialize
       @children = []
+      self.class.child_collections.each do |var_name|
+        instance_variable_set("@#{var_name}", [])
+      end
     end
 
     def bind model
@@ -68,6 +71,7 @@ module XDry
 
       # on NSome, :pop, :store_into => :my_var
       # on NOther, :start => SOther
+      # on NAwesome, :add_to => :awesomes
       def on child_class, *args
         options = args.last.is_a?(Hash) ? args.pop : {}
         if args.include? :pop
@@ -80,6 +84,14 @@ module XDry
           (child_action_table[child_class] ||= []) << lambda do |instance, child|
             instance.send(:instance_variable_set, "@#{var_name}", child)
           end
+          attr_reader :"#{var_name}"
+        end
+        if var_name = options[:add_to]
+          (child_action_table[child_class] ||= []) << lambda do |instance, child|
+            instance.send(:instance_variable_get, "@#{var_name}") << child
+          end
+          child_collections << var_name
+          attr_reader :"#{var_name}"
         end
       end
 
@@ -93,6 +105,10 @@ module XDry
 
       def child_action_table
         @child_action_table ||= {}
+      end
+
+      def child_collections
+        @child_collections ||= []
       end
 
     end

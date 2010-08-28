@@ -18,6 +18,7 @@ module XDry
     parse_using PInterfaceHeader
 
     on NEnd, :pop
+    on NSynthesize, :add_to => :synthesizes
 
     def class_name
       @start_node.class_name

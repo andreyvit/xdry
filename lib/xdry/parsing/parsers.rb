@@ -90,6 +90,9 @@ module XDry
         selector_def = SelectorDef.parse(selector_decl)
         ret_type = VarType.parse(ret_type_decl)
         yield NMethodHeader.new(selector_def, ret_type)
+
+      when /^@synthesize/
+        yield NSynthesize.parse(line)
       end
     end
 

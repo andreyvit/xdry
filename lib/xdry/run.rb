@@ -141,6 +141,13 @@ module XDry
         oclass.methods.each do |omethod|
           puts "      #{omethod}" if DEBUG
         end
+
+        oclass.implementations.each do |nimpl|
+          puts "      #{nimpl}"
+          nimpl.synthesizes.each do |nsynth|
+            puts "        #{nsynth}"
+          end
+        end
       end
 
       synthesize_out = Emitter.new

@@ -18,9 +18,9 @@ module XDry
     def << child
       case child
       when SInterface
-        child.bind(lookup_class(child.class_name))
+        lookup_class(child.class_name).add_interface child
       when SImplementation
-        child.bind(lookup_class(child.class_name))
+        lookup_class(child.class_name).add_implementation child
       end
     end
 
@@ -33,6 +33,8 @@ module XDry
 
   class OClass
     attr_reader :name, :field_defs, :attributes, :methods
+    attr_reader :interfaces
+    attr_reader :implementations
 
     def initialize oglobal, name
       @oglobal, @name = oglobal, name
@@ -45,6 +47,16 @@ module XDry
 
       @field_defs = []
       @property_defs = []
+      @interfaces = []
+      @implementations = []
+    end
+
+    def add_interface child
+      @interfaces << child.bind(self)
+    end
+
+    def add_implementation child
+      @implementations << child.bind(self)
     end
 
     def << node

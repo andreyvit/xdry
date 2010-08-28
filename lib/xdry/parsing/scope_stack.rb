@@ -10,18 +10,20 @@ module XDry
 
     def parse_line line, eol_comments
       @current_scope.parser.parse_line! line, eol_comments do |node|
-        # update the scope based on this new node
-        while @current_scope.ends_after? node
-          pop
+        unless node.nil?  # to simply code we allow the parser to yield nil when it cannot parse something
+          # update the scope based on this new node
+          while @current_scope.ends_after? node
+            pop
+          end
+          if subscope = @current_scope.subscope_for(node)
+            # a subscope is added as a child of its parent scope
+            yield @current_scope, subscope
+            subscope.assert_bound!
+            push subscope
+          end
+          # add the new node to the scope we have finally decided on
+          yield @current_scope, node
         end
-        if subscope = @current_scope.subscope_for(node)
-          # a subscope is added as a child of its parent scope
-          yield @current_scope, subscope
-          subscope.assert_bound!
-          push subscope
-        end
-        # add the new node to the scope we have finally decided on
-        yield @current_scope, node
       end
     end
 
