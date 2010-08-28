@@ -120,3 +120,9 @@ TODO
 * auto-generate missing fields for declared properties
 * when you declare a method, add a stub implementation
 * when you declare `+ (Foo *)sharedSomething`, insert the singleton boilerplate code
+
+
+License
+-------
+
+XD.R.Y. is licensed under the MIT license. Please see LICENSE file for details.
