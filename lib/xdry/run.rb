@@ -1,3 +1,5 @@
+require 'optparse'
+
 module XDry
 
   def self.add_persistence out, oclass
@@ -181,10 +183,42 @@ module XDry
     end
   end
 
-  def self.run
+  Config = Struct.new(:only)
+
+  def self.parse_command_line_config(args)
+      config = Config.new
+      config.only = nil
+
+      opts = OptionParser.new do |opts|
+          opts.banner = "Usage: xdry [options]"
+
+          opts.separator ""
+          opts.separator "Filtering options:"
+
+          opts.on("-o", "--only=MASK", "Only process files matching this mask") do |v|
+              config.only = v
+          end
+
+          opts.separator ""
+          opts.separator "Common options:"
+
+          opts.on_tail("-h", "--help", "Show this message") do
+              puts opts
+              exit
+          end
+      end
+
+      opts.parse!(args)
+      return config
+  end
+
+  def self.run args
+    config = parse_command_line_config(args)
+
     oglobal = OGlobal.new
 
     Dir["**/*.m"].each do |m_file|
+      next if config.only and not File.fnmatch(config.only, m_file)
       h_file = m_file.sub /\.m$/, '.h'
       if File.file? h_file
         puts h_file if DEBUG
