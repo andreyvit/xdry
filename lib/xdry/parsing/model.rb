@@ -179,6 +179,10 @@ module XDry
       @field_def && @field_def.persistent?
     end
 
+    def type_known?
+      not type.nil?
+    end
+
     def type
       if @property_def
         @property_def.type

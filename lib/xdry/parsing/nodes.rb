@@ -60,6 +60,7 @@ module XDry
 
     def initialize name, type
       super()
+      raise StandardError, "type cannot be nil for prop #{name}" if type.nil?
       @name, @type = name, type
     end
 

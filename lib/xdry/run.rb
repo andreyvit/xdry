@@ -110,7 +110,7 @@ module XDry
     dealloc_out = Emitter.new
 
     oclass.attributes.each do |oattr|
-      next unless oattr.has_field_def?
+      next if not oattr.has_field_def?
 
       field_name = oattr.field_name
       retain_policy = Boxing.retain_policy_of(oattr.type)
@@ -150,14 +150,19 @@ module XDry
         end
       end
 
-      synthesize_out = Emitter.new
       oclass.attributes.each do |oattr|
         unless oattr.has_field_def?
-          out << oattr.new_field_def.to_source
-          oattr.add_field_def! oattr.new_field_def
+          if oattr.type_known?
+            out << oattr.new_field_def.to_source
+            oattr.add_field_def! oattr.new_field_def
+          end
         end
         unless oattr.has_property_def?
-          out << oattr.new_property_def.to_source
+          if oattr.type_known?
+            pd = oattr.new_property_def
+            out << pd.to_source
+            # oattr.add_property_def! pd
+          end
         end
         if oattr.has_property_def?
           unless oattr.has_synthesize?
@@ -171,10 +176,7 @@ module XDry
             patcher.insert_after pos, [synthesize.to_s]
           end
         end
-        synthesize_out << "@synthesize #{oattr.name}=#{oattr.field_name};"
       end
-
-      out << synthesize_out
 
       if oclass.attributes.any? { |a| a.persistent? }
         add_persistence out, oclass
