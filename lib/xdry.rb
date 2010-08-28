@@ -1,6 +1,5 @@
 
 module XDry
-  DEBUG = true
 end
 
 %w{

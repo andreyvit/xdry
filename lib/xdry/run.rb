@@ -126,20 +126,20 @@ module XDry
     end
   end
 
-  def self.produce_everything out_file, oglobal, patcher
+  def self.produce_everything out_file, oglobal, patcher, config
     puts "Generating code... "
     oglobal.classes.each do |oclass|
       puts "  - #{oclass.name}"
 
       out = Emitter.new
 
-      if DEBUG
+      if config.verbose
         oclass.attributes.each do |oattr|
           puts "      #{oattr}"
         end
 
         oclass.methods.each do |omethod|
-          puts "      #{omethod}" if DEBUG
+          puts "      #{omethod}" if config.verbose
         end
 
         oclass.implementations.each do |nimpl|
@@ -204,13 +204,14 @@ module XDry
     end
   end
 
-  Config = Struct.new(:only, :dry_run, :watch)
+  Config = Struct.new(:only, :dry_run, :watch, :verbose)
 
   def self.parse_command_line_config(args)
       config = Config.new
       config.only = nil
       config.dry_run = true
       config.watch = false
+      config.verbose = false
 
       opts = OptionParser.new do |opts|
           opts.banner = "Usage: xdry [options]"
@@ -242,6 +243,10 @@ module XDry
           opts.separator ""
           opts.separator "Common options:"
 
+          opts.on("-v", "--verbose", "Print TONS of progress information") do
+            config.verbose = true
+          end
+
           opts.on_tail("-h", "--help", "Show this message") do
               puts opts
               exit
@@ -259,9 +264,10 @@ module XDry
       next if config.only and not File.fnmatch(config.only, m_file)
       h_file = m_file.sub /\.m$/, '.h'
       if File.file? h_file
-        puts h_file if DEBUG
+        puts h_file if config.verbose
 
         parser = ParsingDriver.new(oglobal)
+        parser.verbose = config.verbose
         parser.parse_file(h_file)
         parser.parse_file(m_file)
       end
@@ -272,7 +278,7 @@ module XDry
 
     out_file_name = 'xdry.m'
     open(out_file_name, 'w') do |out_file|
-      self.produce_everything(out_file, oglobal, patcher)
+      self.produce_everything(out_file, oglobal, patcher, config)
     end
 
     return patcher.save!

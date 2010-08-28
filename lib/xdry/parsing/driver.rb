@@ -3,8 +3,11 @@ require 'generator'
 module XDry
 
   class ParsingDriver
+    attr_accessor :verbose
+
     def initialize oglobal
       @oglobal = oglobal
+      @verbose = false
     end
 
     def new_lines_generator file_name
@@ -34,13 +37,14 @@ module XDry
       gen = new_lines_generator(file_name)
 
       scope_stack = ScopeStack.new(@oglobal.new_file_scope)
+      scope_stack.verbose = @verbose
       while gen.next?
         orig_line, line, pos, eol_comments = gen.next
-        puts "        #{pos} #{orig_line}" if DEBUG
+        puts "        #{pos} #{orig_line}" if @verbose
         scope_stack.parse_line line, eol_comments do |scope, child|
           # child is a Node or a Scope
           child.pos = pos if child.is_a? Node
-          puts "#{scope} << #{child}" if DEBUG
+          puts "#{scope} << #{child}" if @verbose
           scope << child
         end
       end

@@ -3,6 +3,8 @@ module XDry
 
   class ScopeStack
 
+    attr_accessor :verbose
+
     def initialize root_scope
       @stack = []
       push root_scope
@@ -42,7 +44,7 @@ module XDry
 
     def update_current_scope
       old_scope, @current_scope = @current_scope, @stack[-1]
-      puts "#{old_scope} --> #{@current_scope}" if DEBUG
+      puts "#{old_scope} --> #{@current_scope}" if @verbose
     end
 
   end
