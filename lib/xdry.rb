@@ -5,7 +5,8 @@ end
 
 %w{
     parsing/parts/var_types parsing/parts/selectors
-    parsing/nodes parsing/model parsing/pos parsing/parsers parsing/scopes
+    parsing/nodes parsing/model parsing/pos parsing/parsers
+    parsing/scopes_support parsing/scopes
     parsing/scope_stack parsing/driver
 
     patching/emitter patching/patcher
