@@ -11,6 +11,21 @@ module XDry
       @names_to_classes.values
     end
 
+    def new_file_scope
+      SFile.new.bind(self)
+    end
+
+    def << child
+      case child
+      when SInterface
+        child.bind(lookup_class(child.class_name))
+      when SImplementation
+        child.bind(lookup_class(child.class_name))
+      end
+    end
+
+  private
+
     def lookup_class name
       @names_to_classes[name] ||= OClass.new(self, name)
     end
@@ -32,21 +47,21 @@ module XDry
       @property_defs = []
     end
 
-    def add! fragment
-      case fragment
-      when OFieldDef
-        @field_defs << fragment
-        attr_name = fragment.name.gsub /^_/, ''
-        lookup_attribute(attr_name).add_field_def! fragment
-      when OPropertyDef
-        @property_defs << fragment
-        attr_name = fragment.name
-        lookup_attribute(attr_name).add_property_def! fragment
-      when OMethodHeader
-        selector = fragment.selector
-        lookup_method(selector).add_method_header! fragment
+    def << node
+      case node
+      when NFieldDef
+        @field_defs << node
+        attr_name = node.name.gsub /^_/, ''
+        lookup_attribute(attr_name).add_field_def! node
+      when NPropertyDef
+        @property_defs << node
+        attr_name = node.name
+        lookup_attribute(attr_name).add_property_def! node
+      when NMethodHeader
+        selector = node.selector
+        lookup_method(selector).add_method_header! node
       else
-        raise StandardError, "Unknown fragment: #{fragment}"
+        puts "Skipping #{node}"
       end
     end
 
@@ -117,11 +132,11 @@ module XDry
     end
 
     def new_property_def
-      OPropertyDef.new(name, type)
+      NPropertyDef.new(name, type)
     end
 
     def new_field_def
-      OFieldDef.new(name, type)
+      NFieldDef.new(name, type)
     end
 
     def persistent?

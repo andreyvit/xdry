@@ -69,16 +69,16 @@ module XDry
     end
 
     unless mapping.empty?
-      new_selector_def = OCompoundSelectorDef.new(components.collect do |comp|
+      new_selector_def = CompoundSelectorDef.new(components.collect do |comp|
         if oattr = mapping[kw = comp.keyword_without_colon]
           arg_name = comp.arg_name
           arg_name = oattr.name if arg_name.empty?
-          OSelectorComponent.new(comp.keyword, arg_name, comp.type || oattr.type)
+          SelectorComponent.new(comp.keyword, arg_name, comp.type || oattr.type)
         else
           comp
         end
       end)
-      method_header = OMethodHeader.new(new_selector_def, omethod.ret_type)
+      method_header = NMethodHeader.new(new_selector_def, omethod.ret_type)
 
       init_out = Emitter.new
 
@@ -124,7 +124,7 @@ module XDry
     end
   end
 
-  def self.produce_everything out_file, oglobal
+  def self.produce_everything out_file, oglobal, patcher
     puts "Generating code... "
     oglobal.classes.each do |oclass|
       puts "  - #{oclass.name}"
@@ -189,15 +189,17 @@ module XDry
       if File.file? h_file
         puts h_file if DEBUG
 
-        parser = Parser.new(oglobal)
-        parser.parse_header(h_file)
-        # parser.parse_header(m_file)
+        parser = ParsingDriver.new(oglobal)
+        parser.parse_file(h_file)
+        parser.parse_file(m_file)
       end
     end
 
+    patcher = Patcher.new
+
     out_file_name = 'xdry.m'
     open(out_file_name, 'w') do |out_file|
-      self.produce_everything(out_file, oglobal)
+      self.produce_everything(out_file, oglobal, patcher)
     end
     puts "See #{out_file_name}."
   end

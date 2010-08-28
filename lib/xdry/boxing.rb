@@ -184,9 +184,9 @@ module XDry
         return ArrayConverter.new(type.type_hint || 'NSObject', 'initWithDictionary', 'dictionaryRepresentation')
       end
       case type
-      when OSimpleVarType
+      when SimpleVarType
         SIMPLE_CONVERTIONS[type.name]
-      when OPointerVarType
+      when PointerVarType
         POINTER_CONVERTIONS[type.name]
       else
         nil
@@ -198,9 +198,9 @@ module XDry
         conv.retain_policy
       else
         case type
-          when OPointerVarType then RetainPolicy::RETAIN
-          when OIdVarType      then RetainPolicy::ASSIGN_REF
-          when OSimpleVarType  then RetainPolicy::ASSIGN_VALUE
+          when PointerVarType then RetainPolicy::RETAIN
+          when IdVarType      then RetainPolicy::ASSIGN_REF
+          when SimpleVarType  then RetainPolicy::ASSIGN_VALUE
         end
       end
     end
