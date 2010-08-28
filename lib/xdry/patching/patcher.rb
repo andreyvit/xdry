@@ -3,8 +3,11 @@ module XDry
 
   class Patcher
 
+    attr_accessor :dry_run
+
     def initialize
       @patched = {}
+      @dry_run = true
     end
 
     def insert_after pos, new_lines
@@ -22,8 +25,14 @@ module XDry
     def save!
       for file_ref, lines in @patched
         original_path = file_ref.path
-        ext = File.extname(original_path)
-        new_path = File.join(File.dirname(original_path), File.basename(original_path, ext) + '.xdry' + ext)
+
+        new_path = if @dry_run
+          ext = File.extname(original_path)
+          File.join(File.dirname(original_path), File.basename(original_path, ext) + '.xdry' + ext)
+        else
+          original_path
+        end
+
         text = lines.join("")
         open(new_path, 'w') { |f| f.write text }
       end

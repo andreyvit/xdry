@@ -202,11 +202,12 @@ module XDry
     end
   end
 
-  Config = Struct.new(:only)
+  Config = Struct.new(:only, :dry_run)
 
   def self.parse_command_line_config(args)
       config = Config.new
       config.only = nil
+      config.dry_run = true
 
       opts = OptionParser.new do |opts|
           opts.banner = "Usage: xdry [options]"
@@ -216,6 +217,16 @@ module XDry
 
           opts.on("-o", "--only=MASK", "Only process files matching this mask") do |v|
               config.only = v
+          end
+
+          opts.separator ""
+          opts.separator "Patching options:"
+
+          opts.on("-R", "--real", "Really apply changes to your files (opposite of -n)") do |v|
+            config.dry_run = false
+          end
+          opts.on("-n", "--dry-run", "Save changed files as .xdry.{h/m}. Default for now.") do |v|
+            config.dry_run = true
           end
 
           opts.separator ""
@@ -249,6 +260,7 @@ module XDry
     end
 
     patcher = Patcher.new
+    patcher.dry_run = config.dry_run
 
     out_file_name = 'xdry.m'
     open(out_file_name, 'w') do |out_file|
