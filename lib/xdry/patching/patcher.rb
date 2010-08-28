@@ -36,6 +36,9 @@ module XDry
         text = lines.join("")
         open(new_path, 'w') { |f| f.write text }
       end
+      changed_file_refs = @patched.keys
+      @patched = {}
+      return changed_file_refs
     end
 
   private

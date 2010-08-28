@@ -275,8 +275,7 @@ module XDry
       self.produce_everything(out_file, oglobal, patcher)
     end
 
-    patcher.save!
-    puts "See #{out_file_name}."
+    return patcher.save!
   end
 
   def self.run args
@@ -288,7 +287,18 @@ module XDry
       require 'rubygems'
       require 'fssm'
       rebuild = lambda do
-        run_once config
+        changed_file_refs = run_once(config)
+        unless changed_file_refs.empty?
+          system "growlnotify", "-a", "Xcode", "-t", "XD.R.Y.", "-m", "Updating..."
+          system "osascript", "-e", '
+            tell application "Finder" to activate
+            delay 0.3
+            tell application "Xcode" to activate
+            delay 0.5
+            tell application "System Events" to keystroke "u" using {command down}
+          '
+          system "growlnotify", "-a", "Xcode", "-t", "XD.R.Y.", "-m", "Updated!"
+        end
       end
       puts
       puts "Monitoring for file system changes..."
