@@ -168,4 +168,7 @@ module XDry
 
   end
 
+  class NOpeningBrace < Node
+  end
+
 end

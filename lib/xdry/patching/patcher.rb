@@ -7,10 +7,16 @@ module XDry
       @patched = {}
     end
 
-    def insert_after pos, new_line
+    def insert_after pos, new_lines
       lines = patched_lines_of(pos.file_ref)
       line_index = pos.line_no - 1
-      lines[line_index+1 .. line_index] = new_line
+
+      puts "INSERTING LINES:"
+      new_lines.each { |line| puts "    #{line}" }
+      puts "  AFTER LINE:"
+      puts "    #{lines[line_index]}"
+
+      lines[line_index+1 .. line_index] = new_lines.collect { |line| "#{line}\n" }
     end
 
     def save!
@@ -26,7 +32,7 @@ module XDry
   private
 
     def patched_lines_of file_ref
-      @patched[file_ref] ||= load_lines_of(file_path)
+      @patched[file_ref] ||= load_lines_of(file_ref)
     end
 
     def load_lines_of file_ref

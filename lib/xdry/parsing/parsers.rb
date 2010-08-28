@@ -22,6 +22,7 @@ module XDry
         when /^@interface\s+(\w+)/  #\s*(?:[:(][\w:(),\s]*)?
           name, supers, postfix = $1, $2, $'
           yield NInterfaceStart.new(name)
+          yield NOpeningBrace.new if postfix =~ /\{$/
 
         when /^@implementation\s+(\w+)/
           name = $1
@@ -77,6 +78,8 @@ module XDry
 
     def parse_line! line, eol_comments
       case line
+      when /^\{$/
+        yield NOpeningBrace.new
       when /@end/
         yield NEnd.new
       when /^@property(\s*\([\w\s,]*\))?\s+(IBOutlet\s+)?(\w+)\s*\*\s*(\w+)\s*;$/

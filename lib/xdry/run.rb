@@ -159,6 +159,18 @@ module XDry
         unless oattr.has_property_def?
           out << oattr.new_property_def.to_source
         end
+        if oattr.has_property_def?
+          unless oattr.has_synthesize?
+            synthesize = oattr.new_synthesize
+            impl = oclass.main_implementation
+            pos = if impl.synthesizes.empty?
+              impl.start_node.pos
+            else
+              impl.synthesizes.sort { |a, b| a.pos.line_no <=> b.pos.line_no }.last.pos
+            end
+            patcher.insert_after pos, [synthesize.to_s]
+          end
+        end
         synthesize_out << "@synthesize #{oattr.name}=#{oattr.field_name};"
       end
 
@@ -242,6 +254,8 @@ module XDry
     open(out_file_name, 'w') do |out_file|
       self.produce_everything(out_file, oglobal, patcher)
     end
+
+    patcher.save!
     puts "See #{out_file_name}."
   end
 

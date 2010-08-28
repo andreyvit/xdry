@@ -59,6 +59,11 @@ module XDry
       @implementations << child.bind(self)
     end
 
+    def main_implementation
+      # FIXME
+      @implementations.first
+    end
+
     def << node
       case node
       when NFieldDef
@@ -72,6 +77,12 @@ module XDry
       when NMethodHeader
         selector = node.selector
         lookup_method(selector).add_method_header! node
+      when NSynthesize
+        node.items.each do |item|
+          lookup_attribute(item.property_name).add_synthesize! node
+        end
+      when SInterfaceFields
+        node.bind(self)
       else
         puts "Skipping #{node}"
       end
@@ -121,6 +132,7 @@ module XDry
 
       @field_def    = nil
       @property_def = nil
+      @synthesizes  = []
     end
 
     def field_name
@@ -135,6 +147,10 @@ module XDry
       @property_def = property_def
     end
 
+    def add_synthesize! synthesize
+      @synthesizes << synthesize
+    end
+
     def has_field_def?
       not @field_def.nil?
     end
@@ -143,12 +159,20 @@ module XDry
       not @property_def.nil?
     end
 
+    def has_synthesize?
+      not @synthesizes.empty?
+    end
+
     def new_property_def
       NPropertyDef.new(name, type)
     end
 
     def new_field_def
       NFieldDef.new(name, type)
+    end
+
+    def new_synthesize
+      NSynthesize.new([SynthesizeItem.new(name, (field_name == name ? nil : field_name) )])
     end
 
     def persistent?
@@ -166,7 +190,9 @@ module XDry
     end
 
     def to_s
-      "#{type} #{name}"
+      traits = []
+      traits << field_name if has_field_def?
+      "#{type} #{name}" + (traits.empty? ? "" : " (" + traits.join(", ") + ")")
     end
   end
 
