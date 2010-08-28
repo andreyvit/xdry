@@ -284,6 +284,22 @@ module XDry
     return patcher.save!
   end
 
+  def self.test_run sources
+    oglobal = OGlobal.new
+
+    parser = ParsingDriver.new(oglobal)
+    sources.each do |file_path, content|
+      parser.parse_string file_path, content
+    end
+
+    patcher = Patcher.new
+
+    out_file = StringIO.new
+    self.produce_everything(out_file, oglobal, patcher, Config.new)
+
+    return patcher.retrieve!
+  end
+
   def self.run args
     config = parse_command_line_config(args)
 

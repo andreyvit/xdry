@@ -7,6 +7,22 @@ module XDry
     def initialize path
       @path = path
     end
+
+    def read
+      open(file_ref.path) { |f| f.read }
+    end
+  end
+
+  class TestFileRef
+    attr_reader :path
+
+    def initialize path, source
+      @path, @source = path, source
+    end
+
+    def read
+      @source
+    end
   end
 
   class Pos

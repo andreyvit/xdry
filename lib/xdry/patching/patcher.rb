@@ -41,6 +41,15 @@ module XDry
       return changed_file_refs
     end
 
+    def retrieve!
+      result = {}
+      for file_ref, lines in @patched
+        result[file_ref.path] = lines.join("")
+      end
+      @patched = {}
+      return result
+    end
+
   private
 
     def patched_lines_of file_ref
@@ -48,7 +57,7 @@ module XDry
     end
 
     def load_lines_of file_ref
-      open(file_ref.path) { |f| f.lines.collect }
+      file_ref.read.lines.collect
     end
 
   end
