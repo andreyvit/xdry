@@ -202,15 +202,23 @@ module XDry
     end
   end
 
-  Config = Struct.new(:only, :dry_run)
+  Config = Struct.new(:only, :dry_run, :watch)
 
   def self.parse_command_line_config(args)
       config = Config.new
       config.only = nil
       config.dry_run = true
+      config.watch = false
 
       opts = OptionParser.new do |opts|
           opts.banner = "Usage: xdry [options]"
+
+          opts.separator ""
+          opts.separator "General options:"
+
+          opts.on("-w", "--watch", "Watch for file system changes and rerun each time .h/.m is modified") do
+            config.watch = true
+          end
 
           opts.separator ""
           opts.separator "Filtering options:"
@@ -242,9 +250,7 @@ module XDry
       return config
   end
 
-  def self.run args
-    config = parse_command_line_config(args)
-
+  def self.run_once config
     oglobal = OGlobal.new
 
     Dir["**/*.m"].each do |m_file|
@@ -269,6 +275,27 @@ module XDry
 
     patcher.save!
     puts "See #{out_file_name}."
+  end
+
+  def self.run args
+    config = parse_command_line_config(args)
+
+    run_once config
+
+    if config.watch
+      require 'rubygems'
+      require 'fssm'
+      rebuild = lambda do
+        run_once config
+      end
+      puts
+      puts "Monitoring for file system changes..."
+      FSSM.monitor '.', ['**/*.{h,m}'] do |monitor|
+        monitor.create &rebuild
+        monitor.update &rebuild
+        monitor.delete &rebuild
+      end
+    end
   end
 
 end
