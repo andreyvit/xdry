@@ -128,6 +128,9 @@ module XDry
 
   def self.produce_everything out_file, oglobal, patcher, config
     puts "Generating code... " if config.verbose
+
+    generators = Generators::ALL.collect { |klass| klass.new(config, patcher) }
+
     oglobal.classes.each do |oclass|
       puts "  - #{oclass.name}" if config.verbose
 
@@ -150,6 +153,8 @@ module XDry
         end
       end
 
+      generators.each { |gen| gen.process_class(oclass) }
+
       oclass.attributes.each do |oattr|
         unless oattr.has_field_def?
           if oattr.type_known?
@@ -162,20 +167,6 @@ module XDry
             pd = oattr.new_property_def
             out << pd.to_source
             # oattr.add_property_def! pd
-          end
-        end
-        if oattr.has_property_def?
-          unless oattr.has_synthesize? || oclass.has_method_impl?(oattr.getter_selector)
-            synthesize = oattr.new_synthesize
-            impl = oclass.main_implementation
-            new_lines = [synthesize.to_s]
-            if impl.synthesizes.empty?
-              pos = impl.start_node.pos
-              new_lines = [""] + new_lines + [""]
-            else
-              pos = impl.synthesizes.sort { |a, b| a.pos.line_no <=> b.pos.line_no }.last.pos
-            end
-            patcher.insert_after pos, new_lines
           end
         end
       end

@@ -11,5 +11,8 @@ end
 
     patching/emitter patching/patcher
 
+    generators_support
+
     boxing run
   }.each { |name| require File.join(File.dirname(__FILE__), 'xdry', name) }
+Dir[File.join(File.dirname(__FILE__), 'xdry', 'generators', '*.rb')].each { |f| require f }
