@@ -215,7 +215,6 @@ module XDry
 
     def initialize selector
       @selector = selector
-      @header, @implementation = nil, nil
     end
 
     def add_method_header! method_header
