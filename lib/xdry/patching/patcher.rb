@@ -3,7 +3,7 @@ module XDry
 
   class Patcher
 
-    attr_accessor :dry_run
+    attr_accessor :dry_run, :verbose
 
     def initialize
       @patched = {}
@@ -14,10 +14,12 @@ module XDry
       lines = patched_lines_of(pos.file_ref)
       line_index = pos.line_no - 1
 
-      puts "INSERTING LINES:"
-      new_lines.each { |line| puts "    #{line}" }
-      puts "  AFTER LINE:"
-      puts "    #{lines[line_index]}"
+      if @verbose
+        puts "INSERTING LINES:"
+        new_lines.each { |line| puts "    #{line}" }
+        puts "  AFTER LINE:"
+        puts "    #{lines[line_index]}"
+      end
 
       # collapse leading/trailing empty lines with the empty lines that already exist
       # in the source code

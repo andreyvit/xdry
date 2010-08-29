@@ -85,8 +85,6 @@ module XDry
         node.bind(self)
       when SMethodImpl
         lookup_method(node.selector).add_method_impl! node
-      else
-        puts "Skipping #{node}"
       end
     end
 

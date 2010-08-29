@@ -127,9 +127,9 @@ module XDry
   end
 
   def self.produce_everything out_file, oglobal, patcher, config
-    puts "Generating code... "
+    puts "Generating code... " if config.verbose
     oglobal.classes.each do |oclass|
-      puts "  - #{oclass.name}"
+      puts "  - #{oclass.name}" if config.verbose
 
       out = Emitter.new
 
@@ -139,7 +139,7 @@ module XDry
         end
 
         oclass.methods.each do |omethod|
-          puts "      #{omethod}" if config.verbose
+          puts "      #{omethod}"
         end
 
         oclass.implementations.each do |nimpl|
@@ -277,6 +277,7 @@ module XDry
 
     patcher = Patcher.new
     patcher.dry_run = config.dry_run
+    patcher.verbose = config.verbose
 
     out_file_name = 'xdry.m'
     open(out_file_name, 'w') do |out_file|
@@ -286,18 +287,23 @@ module XDry
     return patcher.save!
   end
 
-  def self.test_run sources
+  def self.test_run sources, verbose
+    config = Config.new
+    config.verbose = verbose
+
     oglobal = OGlobal.new
 
     parser = ParsingDriver.new(oglobal)
+    parser.verbose = config.verbose
     sources.each do |file_path, content|
       parser.parse_string file_path, content
     end
 
     patcher = Patcher.new
+    patcher.verbose = config.verbose
 
     out_file = StringIO.new
-    self.produce_everything(out_file, oglobal, patcher, Config.new)
+    self.produce_everything(out_file, oglobal, patcher, config)
 
     return patcher.retrieve!
   end

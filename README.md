@@ -126,3 +126,32 @@ License
 -------
 
 XD.R.Y. is licensed under the MIT license. Please see LICENSE file for details.
+
+
+Hacking
+-------
+
+To run the tests, you need rspec, and also, since they are all based on string comparison, you will also want diff-lcs:
+
+    sudo gem install rake rspec diff-lcs
+
+To run the tests, use:
+
+    rake
+
+If something goes wrong, you will want to have a verbose output:
+
+    VERBOSE=1 rake
+
+(You can also run the tests using `spec -b -c -Du .`, which is exactly what `rake` does.)
+
+To fix something, please:
+
+1. Fork [the project on GitHub](http://github.com/mockko/xdry) and checkout your fork.
+2. Create a branch for your fix: `git checkout -b fix-foo-doesnt-do-bar`
+3. Add a test for the future fix to `spec/` before changing anything.
+4. Run the tests to make sure the new test does not pass.
+5. Fix the code until all tests pass again.
+6. Commit. (You can commit several times, but you get bonus points if you can squash it all into a single commit before asking me to pull.)
+7. Push your branch to GitHub. If you have [git_remote_branch](http://github.com/webmat/git_remote_branch) installed (recommended), do `grb publish fix-foo-doesnt-do-bar`; otherwise, just `git push origin fix-foo-doesnt-do-bar`. (To publish again, just run `git push`.)
+8. Send me a pull request via GitHub.
