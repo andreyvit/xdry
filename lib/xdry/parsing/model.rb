@@ -241,8 +241,6 @@ module XDry
       header_or_impl.to_s
     end
 
-  private
-
     def header_or_impl
       @header || @impl.start_node
     end
