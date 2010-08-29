@@ -156,16 +156,6 @@ module XDry
 
       generators.each { |gen| gen.process_class(oclass) }
 
-      oclass.attributes.each do |oattr|
-        unless oattr.has_property_def?
-          if oattr.type_known?
-            pd = oattr.new_property_def
-            out << pd.to_source
-            # oattr.add_property_def! pd
-          end
-        end
-      end
-
       if oclass.attributes.any? { |a| a.persistent? }
         add_persistence out, oclass
       end
