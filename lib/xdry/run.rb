@@ -134,8 +134,6 @@ module XDry
     oglobal.classes.each do |oclass|
       puts "  - #{oclass.name}" if config.verbose
 
-      out = Emitter.new
-
       if config.verbose
         oclass.attributes.each do |oattr|
           puts "      #{oattr}"
@@ -153,15 +151,12 @@ module XDry
         end
       end
 
+      out = Emitter.new
+      generators.each { |gen| gen.out = out }
+
       generators.each { |gen| gen.process_class(oclass) }
 
       oclass.attributes.each do |oattr|
-        unless oattr.has_field_def?
-          if oattr.type_known?
-            out << oattr.new_field_def.to_source
-            oattr.add_field_def! oattr.new_field_def
-          end
-        end
         unless oattr.has_property_def?
           if oattr.type_known?
             pd = oattr.new_property_def
