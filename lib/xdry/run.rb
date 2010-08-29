@@ -5,7 +5,12 @@ module XDry
   def self.produce_everything out_file, oglobal, patcher, config
     puts "Generating code... " if config.verbose
 
-    generators = Generators::ALL.collect { |klass| klass.new(config, patcher) }
+    generators = Generators::ALL.select { |klass| config.enabled?(klass.id) }.
+        collect { |klass| klass.new(config, patcher) }
+
+    if config.verbose
+      puts "Running generators: " + generators.collect { |gen| gen.class.id }.join(", ")
+    end
 
     oglobal.classes.each do |oclass|
       puts "  - #{oclass.name}" if config.verbose
@@ -45,14 +50,25 @@ module XDry
     end
   end
 
-  Config = Struct.new(:only, :dry_run, :watch, :verbose)
+  class Config < Struct.new(:only, :dry_run, :watch, :verbose, :disable, :enable_only)
+
+    def initialize
+      self.only = nil
+      self.dry_run = true
+      self.watch = false
+      self.verbose = false
+      self.disable = []
+      self.enable_only = nil
+    end
+
+    def enabled? gen_id
+      (enable_only.nil? || enable_only.include?(gen_id)) && !disable.include?(gen_id)
+    end
+
+  end
 
   def self.parse_command_line_config(args)
       config = Config.new
-      config.only = nil
-      config.dry_run = true
-      config.watch = false
-      config.verbose = false
 
       opts = OptionParser.new do |opts|
           opts.banner = "Usage: xdry [options]"
@@ -69,6 +85,36 @@ module XDry
 
           opts.on("-o", "--only=MASK", "Only process files matching this mask") do |v|
               config.only = v
+          end
+
+          opts.separator ""
+          opts.separator "Choosing which generators to run:"
+
+          opts.on("-e", "--enable-only=LIST", "Only run the given generators (e.g.: -e dealloc,synth)") do |v|
+            config.enable_only = v.split(",").collect { |n| n.strip }
+
+            all = XDry::Generators::ALL.collect { |kl| kl.id }
+            unless (unsup = config.enable_only - all).empty?
+              puts "Unknown generator names in -e: #{unsup.join(', ')}."
+              puts "Supported names are: #{all.join(', ')}."
+              exit 1
+            end
+          end
+
+          opts.on("-d", "--disable=LIST", "Disable the given generators (e.g.: -d dealloc,synth)") do |v|
+            config.disable = v.split(",").collect { |n| n.strip }
+
+            all = XDry::Generators::ALL.collect { |kl| kl.id }
+            unless (unsup = config.disable - all).empty?
+              puts "Unknown generator names in -d: #{unsup.join(', ')}."
+              puts "Supported names are: #{all.join(', ')}."
+              exit 1
+            end
+          end
+
+          opts.on("--list", "List all supported generators and exit") do |v|
+            XDry::Generators::ALL.each { |kl| puts "#{kl.id}" }
+            exit
           end
 
           opts.separator ""
@@ -126,10 +172,7 @@ module XDry
     return patcher.save!
   end
 
-  def self.test_run sources, verbose
-    config = Config.new
-    config.verbose = verbose
-
+  def self.test_run sources, config
     oglobal = OGlobal.new
 
     parser = ParsingDriver.new(oglobal)

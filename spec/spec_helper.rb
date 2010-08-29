@@ -4,8 +4,12 @@ require 'xdry'
 require 'spec'
 require 'spec/autorun'
 
-def xdry content
-  verbose = ((ENV['VERBOSE'] || '0').to_i != 0)
+def xdry gens, content
+  config = XDry::Config.new
+  config.verbose = ((ENV['VERBOSE'] || '0').to_i != 0)
+
+  gens = [gens] if gens.is_a?(Symbol)
+  config.enable_only = gens.collect { |g| g.to_s }
 
   first_line_indent = content.split("\n", 2).first.gsub(/\S.*$/, '')
   deleted_indent    = first_line_indent.sub(/\s\s$/, '-( |$)')
@@ -17,7 +21,7 @@ def xdry content
   orig_content = orig_content.gsub(/^(#{first_line_indent}|#{deleted_indent})/, '')
   new_content  = new_content.gsub(/^(#{first_line_indent}|#{added_indent})/, '')
 
-  if verbose
+  if config.verbose
     puts "-" * 40
     puts orig_content
     puts "-" * 40
@@ -25,7 +29,7 @@ def xdry content
     puts "-" * 40
   end
 
-  result = XDry.test_run({'main.m' => orig_content}, verbose)['main.m']
+  result = XDry.test_run({'main.m' => orig_content}, config)['main.m']
   result = orig_content if result.nil?
 
   result.should == new_content

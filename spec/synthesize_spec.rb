@@ -3,11 +3,11 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "@synthesize support" do
 
   it "should handle empty input" do
-    xdry("  ")
+    xdry :synth, "  "
   end
 
   it "should add @synthesize when a @property exists" do
-    xdry <<-END
+    xdry :synth, <<-END
       @interface Foo {
         BOOL value;
       }
@@ -23,7 +23,7 @@ describe "@synthesize support" do
   end
 
   it "should reuse existing whitespace when inserting the first @synthesize" do
-    xdry <<-END
+    xdry :synth, <<-END
       @interface Foo {
         BOOL value;
       }
@@ -39,7 +39,7 @@ describe "@synthesize support" do
   end
 
   it "should add @synthesize after existing @synthesize if any" do
-    xdry <<-END
+    xdry :synth, <<-END
       @interface Foo {
         BOOL value;
       }
@@ -57,7 +57,7 @@ describe "@synthesize support" do
   end
 
   it "should use field name in @synthesize if needed" do
-    xdry <<-END
+    xdry :synth, <<-END
       @interface Foo {
         BOOL _value;
       }
@@ -74,7 +74,7 @@ describe "@synthesize support" do
   end
 
   it "shouldn't add @synthesize if a getter is already implemented" do
-    xdry <<-END
+    xdry :synth, <<-END
       @interface Foo {
         BOOL _value;
       }
