@@ -2,26 +2,6 @@ require 'optparse'
 
 module XDry
 
-  def self.add_dealloc out, oclass
-    dealloc_out = Emitter.new
-
-    oclass.attributes.each do |oattr|
-      next if not oattr.has_field_def?
-
-      field_name = oattr.field_name
-      retain_policy = Boxing.retain_policy_of(oattr.type)
-
-      retain_policy.release_and_clear dealloc_out, field_name
-    end
-
-    unless dealloc_out.empty?
-      out.method "(void)dealloc" do
-        out << dealloc_out
-        out << "[super dealloc];"
-      end
-    end
-  end
-
   def self.produce_everything out_file, oglobal, patcher, config
     puts "Generating code... " if config.verbose
 
@@ -51,8 +31,6 @@ module XDry
       generators.each { |gen| gen.out = out }
 
       generators.each { |gen| gen.process_class(oclass) }
-
-      add_dealloc out, oclass
 
       unless out.empty?
         out_file.puts

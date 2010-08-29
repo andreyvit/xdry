@@ -3,6 +3,9 @@ module XDry::Generators
 
   ALL = []
 
+  Emitter = XDry::Emitter
+  Boxing  = XDry::Boxing
+
   class Generator
 
     attr_reader :patcher
