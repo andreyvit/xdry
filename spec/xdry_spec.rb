@@ -61,6 +61,41 @@ describe "Xdry" do
     END
   end
 
+  it "should add @synthesize after existing @synthesize if any" do
+    xdry <<-END
+      @interface Foo {
+        BOOL value;
+      }
+      @property BOOL value;
+      @end
+
+      @implementation Foo
+
+      @synthesize something;
+      @synthesize something_else;
+    + @synthesize value;
+
+      @end
+    END
+  end
+
+  it "should use field name in @synthesize if needed" do
+    xdry <<-END
+      @interface Foo {
+        BOOL _value;
+      }
+      @property BOOL value;
+      @end
+
+      @implementation Foo
+
+      @synthesize something;
+    + @synthesize value=_value;
+
+      @end
+    END
+  end
+
   it "shouldn't add @synthesize if a getter is already implemented" do
     xdry <<-END
       @interface Foo {
