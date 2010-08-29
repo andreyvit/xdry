@@ -165,7 +165,7 @@ module XDry
           end
         end
         if oattr.has_property_def?
-          unless oattr.has_synthesize?
+          unless oattr.has_synthesize? || oclass.has_method_impl?(oattr.getter_selector)
             synthesize = oattr.new_synthesize
             impl = oclass.main_implementation
             new_lines = [synthesize.to_s]

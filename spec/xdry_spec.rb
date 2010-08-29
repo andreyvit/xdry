@@ -60,4 +60,23 @@ describe "Xdry" do
       @end
     END
   end
+
+  it "shouldn't add @synthesize if a getter is already implemented" do
+    xdry <<-END
+      @interface Foo {
+        BOOL _value;
+      }
+      @property BOOL value;
+      @end
+
+      @implementation Foo
+
+      - (BOOL) value {
+        return _value;
+      }
+
+      @end
+    END
+  end
+
 end

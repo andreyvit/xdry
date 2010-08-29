@@ -83,6 +83,8 @@ module XDry
         end
       when SInterfaceFields
         node.bind(self)
+      when SMethodImpl
+        lookup_method(node.selector).add_method_impl! node
       else
         puts "Skipping #{node}"
       end
@@ -97,7 +99,12 @@ module XDry
     end
 
     def find_method selector
-      @selectors_to_methods[name]
+      @selectors_to_methods[selector]
+    end
+
+    def has_method_impl? selector
+      m = find_method(selector)
+      return m && m.has_impl?
     end
 
   private
@@ -183,6 +190,11 @@ module XDry
       not type.nil?
     end
 
+    def getter_selector
+      # FIXME: need to account for a possible selector override declared in @property
+      @name
+    end
+
     def type
       if @property_def
         @property_def.type
@@ -201,7 +213,7 @@ module XDry
   end
 
   class OMethod
-    attr_reader :selector, :header
+    attr_reader :selector, :header, :impl
 
     def initialize selector
       @selector = selector
@@ -212,12 +224,29 @@ module XDry
       @header = method_header
     end
 
+    def add_method_impl! method_impl
+      @impl = method_impl.bind(self)
+    end
+
+    def has_impl?
+      not @impl.nil?
+    end
+
     def ret_type
-      @header.ret_type
+      header_or_impl.ret_type
+    end
+
+    def << child
     end
 
     def to_s
-      @header.to_s
+      header_or_impl.to_s
+    end
+
+  private
+
+    def header_or_impl
+      @header || @impl.start_node
     end
 
   end

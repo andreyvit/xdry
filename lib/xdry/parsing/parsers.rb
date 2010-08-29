@@ -94,8 +94,25 @@ module XDry
         ret_type = VarType.parse(ret_type_decl)
         yield NMethodHeader.new(selector_def, ret_type)
 
+      when /^-\s*\(([^)]+)\)\s*(\w+[\w\s():*]*)\{$/
+        ret_type_decl, selector_decl = $1, $2
+        selector_def = SelectorDef.parse(selector_decl)
+        ret_type = VarType.parse(ret_type_decl)
+        yield NMethodStart.new(selector_def, ret_type)
+
       when /^@synthesize/
         yield NSynthesize.parse(line)
+      end
+    end
+
+  end
+
+  class PMethodImpl < Parser
+
+    def parse_line! line, eol_comments
+      case line
+      when /^\}$/
+        yield NMethodEnd.new
       end
     end
 

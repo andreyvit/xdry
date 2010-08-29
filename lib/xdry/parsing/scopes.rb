@@ -1,6 +1,18 @@
 
 module XDry
 
+  class SMethodImpl < ChildScope
+
+    parse_using PMethodImpl
+
+    on NMethodEnd, :pop, :store_into => :end_node
+
+    def selector
+      @start_node.selector
+    end
+
+  end
+
   class SInterfaceFields < ChildScope
 
     parse_using PInterfaceFields
@@ -28,6 +40,7 @@ module XDry
 
     on NEnd, :pop
     on NSynthesize, :add_to => :synthesizes
+    on NMethodStart, :start => SMethodImpl
 
     def class_name
       @start_node.class_name

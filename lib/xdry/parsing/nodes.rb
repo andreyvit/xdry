@@ -99,6 +99,23 @@ module XDry
 
   end
 
+  class NMethodStart < Node
+    attr_reader :selector_def, :ret_type
+
+    def initialize selector_def, ret_type
+      @selector_def, @ret_type = selector_def, ret_type
+    end
+
+    def selector
+      @selector_def.selector
+    end
+
+    def to_s
+      "- (#{@ret_type})#{selector_def}"
+    end
+
+  end
+
   class NInterfaceStart < Node
     attr_reader :class_name
     def initialize class_name
@@ -170,6 +187,9 @@ module XDry
   end
 
   class NOpeningBrace < Node
+  end
+
+  class NMethodEnd < Node
   end
 
 end
