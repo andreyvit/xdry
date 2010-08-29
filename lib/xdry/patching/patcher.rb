@@ -19,6 +19,21 @@ module XDry
       puts "  AFTER LINE:"
       puts "    #{lines[line_index]}"
 
+      # collapse leading/trailing empty lines with the empty lines that already exist
+      # in the source code
+
+      desired_leading_empty_lines = new_lines.prefix_while(&:blank?).length
+      actual_leading_empty_lines  = lines[0..line_index].suffix_while(&:blank?).length
+      leading_lines_to_remove     = [actual_leading_empty_lines, desired_leading_empty_lines].min
+      new_lines = new_lines[leading_lines_to_remove .. -1]
+
+      # if all lines were empty, the number of trailing empty lines might have changed
+      # after removal of some leading lines, so we compute this after the removal
+      desired_trailing_empty_lines = new_lines.suffix_while(&:blank?).length
+      actual_trailing_empty_lines  = lines[line_index+1..-1].prefix_while(&:blank?).length
+      trailing_lines_to_remove     = [actual_trailing_empty_lines, desired_trailing_empty_lines].min
+      new_lines = new_lines[0 .. -(trailing_lines_to_remove+1)]
+
       lines[line_index+1 .. line_index] = new_lines.collect { |line| "#{line}\n" }
     end
 

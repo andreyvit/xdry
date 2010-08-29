@@ -4,14 +4,14 @@ describe "Xdry" do
 
   def xdry content
     first_line_indent = content.split("\n", 2).first.gsub(/\S.*$/, '')
-    deleted_indent    = first_line_indent.sub(/\s\s$/, '- ')
-    added_indent      = first_line_indent.sub(/\s\s$/, '+ ')
+    deleted_indent    = first_line_indent.sub(/\s\s$/, '-( |$)')
+    added_indent      = first_line_indent.sub(/\s\s$/, "\\\\+( |$)")
 
-    orig_content = content.lines.select { |l| l =~ /^(#{first_line_indent}|#{deleted_indent})/ || l == '' }.join("")
-    new_content  = content.lines.select { |l| l =~ /^(#{first_line_indent}|#{Regexp.escape(added_indent)})/ || l == '' }.join("")
+    orig_content = content.lines.select { |l| l =~ /^(#{first_line_indent}|#{deleted_indent})|^$/ }.join("")
+    new_content  = content.lines.select { |l| l =~ /^(#{first_line_indent}|#{added_indent})|^$/ }.join("")
 
     orig_content = orig_content.gsub(/^(#{first_line_indent}|#{deleted_indent})/, '')
-    new_content  = new_content.gsub(/^(#{first_line_indent}|#{Regexp.escape(added_indent)})/, '')
+    new_content  = new_content.gsub(/^(#{first_line_indent}|#{added_indent})/, '')
 
     puts "-" * 40
     puts orig_content
@@ -38,7 +38,23 @@ describe "Xdry" do
       @end
 
       @implementation Foo
+    +
+    + @synthesize value;
+    +
+      @end
+    END
+  end
 
+  it "should reuse existing whitespace when inserting the first @synthesize" do
+    xdry <<-END
+      @interface Foo {
+        BOOL value;
+      }
+      @property BOOL value;
+      @end
+
+      @implementation Foo
+    +
     + @synthesize value;
 
       @end
