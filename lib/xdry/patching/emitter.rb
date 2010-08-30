@@ -13,6 +13,8 @@ module XDry
       case line
       when Emitter
         @lines.push *line.lines.collect { |l| @current_indent + l }
+      when Array
+        @lines.push *line.collect { |l| @current_indent + l }
       else
         @lines << @current_indent + line
       end
