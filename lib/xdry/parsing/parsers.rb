@@ -113,6 +113,11 @@ module XDry
       case line
       when /^\}$/
         yield NMethodEnd.new
+      when /\[\s*([\w.]+)\s+release\s*\]/
+        expr = $1
+        yield NReleaseCall.new(expr)
+      when /\[super\s/
+        yield NSuperCall.new
       end
     end
 

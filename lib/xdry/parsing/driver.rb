@@ -25,7 +25,8 @@ module XDry
           line = line_without_comments
         end
 
-        g.yield [orig_line, line, Pos.new(file_ref, line_no), eol_comments]
+        indent = if orig_line =~ /^(\s+)/ then $1 else '' end
+        g.yield [orig_line, line, Pos.new(file_ref, line_no), eol_comments, indent]
       end
     end
 
@@ -53,11 +54,14 @@ module XDry
       scope_stack = ScopeStack.new(@oglobal.new_file_scope)
       scope_stack.verbose = @verbose
       while gen.next?
-        orig_line, line, pos, eol_comments = gen.next
+        orig_line, line, pos, eol_comments, indent = gen.next
         puts "        #{pos} #{orig_line}" if @verbose
         scope_stack.parse_line line, eol_comments do |scope, child|
           # child is a Node or a Scope
-          child.pos = pos if child.is_a? Node
+          if child.is_a? Node
+            child.pos = pos
+            child.indent = indent
+          end
           puts "#{scope} << #{child}" if @verbose
           scope << child
         end

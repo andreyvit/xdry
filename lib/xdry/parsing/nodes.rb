@@ -2,7 +2,7 @@
 module XDry
 
   class Node
-    attr_accessor :pos
+    attr_accessor :pos, :indent
 
     def initialize
       @tags = Set.new
@@ -190,6 +190,17 @@ module XDry
   end
 
   class NMethodEnd < Node
+  end
+
+  class NReleaseCall < Node
+    attr_reader :expr
+
+    def initialize expr
+      @expr = expr
+    end
+  end
+
+  class NSuperCall < Node
   end
 
 end

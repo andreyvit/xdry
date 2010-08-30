@@ -11,8 +11,15 @@ module XDry
     end
 
     def insert_after pos, new_lines
-      lines = patched_lines_of(pos.file_ref)
-      line_index = pos.line_no - 1
+      do_insert_after pos.file_ref, pos.line_no - 1, new_lines
+    end
+
+    def insert_before pos, new_lines
+      do_insert_after pos.file_ref, pos.line_no - 2, new_lines
+    end
+
+    def do_insert_after file_ref, line_index, new_lines
+      lines = patched_lines_of(file_ref)
 
       if @verbose
         puts "INSERTING LINES:"
@@ -24,10 +31,13 @@ module XDry
       # collapse leading/trailing empty lines with the empty lines that already exist
       # in the source code
 
-      desired_leading_empty_lines = new_lines.prefix_while(&:blank?).length
-      actual_leading_empty_lines  = lines[0..line_index].suffix_while(&:blank?).length
-      leading_lines_to_remove     = [actual_leading_empty_lines, desired_leading_empty_lines].min
-      new_lines = new_lines[leading_lines_to_remove .. -1]
+      # when line_index == -1 (insert at the beginning of the file), there are no leading lines
+      if line_index >= 0
+        desired_leading_empty_lines = new_lines.prefix_while(&:blank?).length
+        actual_leading_empty_lines  = lines[0..line_index].suffix_while(&:blank?).length
+        leading_lines_to_remove     = [actual_leading_empty_lines, desired_leading_empty_lines].min
+        new_lines = new_lines[leading_lines_to_remove .. -1]
+      end
 
       # if all lines were empty, the number of trailing empty lines might have changed
       # after removal of some leading lines, so we compute this after the removal
@@ -36,7 +46,7 @@ module XDry
       trailing_lines_to_remove     = [actual_trailing_empty_lines, desired_trailing_empty_lines].min
       new_lines = new_lines[0 .. -(trailing_lines_to_remove+1)]
 
-      lines[line_index+1 .. line_index] = new_lines.collect { |line| "#{line}\n" }
+      lines[line_index+1 .. line_index+1] = new_lines.collect { |line| "#{line}\n" } + [lines[line_index+1]]
     end
 
     def save!

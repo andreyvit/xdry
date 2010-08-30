@@ -18,9 +18,23 @@ module Generators
       end
 
       unless dealloc_out.empty?
-        out.method "(void)dealloc" do
-          out << dealloc_out
-          out << "[super dealloc];"
+        dealloc_method = oclass.find_method('dealloc')
+        if dealloc_method && dealloc_method.has_impl?
+          impl = dealloc_method.impl
+          ending_node = impl.children.find { |child| child.is_a? NSuperCall }
+          if ending_node.nil?
+            ending_node = impl.end_node
+            indent = ending_node.indent + INDENT_STEP
+          else
+            indent = ending_node.indent
+          end
+          lines = dealloc_out.lines.collect { |l| indent + l }
+          @patcher.insert_before ending_node.pos, lines
+        else
+          out.method "(void)dealloc" do
+            out << dealloc_out
+            out << "[super dealloc];"
+          end
         end
       end
     end
