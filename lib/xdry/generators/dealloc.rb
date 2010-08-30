@@ -28,10 +28,10 @@ module Generators
       else
         lines = generate_release_calls_if(oclass) { true }
         unless lines.empty?
-          out.method "(void)dealloc" do
-            out << lines
-            out << "[super dealloc];"
-          end
+          lines = ["", "- (void)dealloc {"] + lines.collect { |l| INDENT_STEP+l } +
+              [INDENT_STEP + "[super dealloc];", "}", ""]
+          node = oclass.main_implementation.start_node
+          @patcher.insert_after node.pos, lines
         end
       end
     end

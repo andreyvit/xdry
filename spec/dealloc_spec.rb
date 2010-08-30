@@ -80,4 +80,24 @@ describe "dealloc support" do
     END
   end
 
+  it "should add dealloc if it does not exist" do
+    xdry :dealloc, <<-END
+      @interface Foo {
+        NSString *something;
+        NSString *somethingElse;
+      }
+      @end
+
+      @implementation Foo
+    +
+    + - (void)dealloc {
+    +   [something release], something = nil;
+    +   [somethingElse release], somethingElse = nil;
+    +   [super dealloc];
+    + }
+    +
+      @end
+    END
+  end
+
 end
