@@ -17,7 +17,7 @@ module XDry
 
     parse_using PInterfaceFields
 
-    on NInterfaceFieldsEnd, :pop
+    on NInterfaceFieldsEnd, :pop, :store_into => :end_node
 
   end
 
@@ -27,6 +27,7 @@ module XDry
 
     on NEnd, :pop
     on NOpeningBrace, :start => SInterfaceFields
+    on SInterfaceFields, :store_into => :fields_scope
 
     def class_name
       @start_node.class_name

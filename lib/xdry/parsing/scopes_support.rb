@@ -86,12 +86,12 @@ module XDry
           end
           attr_reader :"#{var_name}"
         end
-        if var_name = options[:add_to]
+        if coll_name = options[:add_to]
           (child_action_table[child_class] ||= []) << lambda do |instance, child|
-            instance.send(:instance_variable_get, "@#{var_name}") << child
+            instance.send(:instance_variable_get, "@#{coll_name}") << child
           end
-          child_collections << var_name
-          attr_reader :"#{var_name}"
+          child_collections << coll_name
+          attr_reader :"#{coll_name}"
         end
       end
 

@@ -1,6 +1,7 @@
 
 module XDry
   INDENT_STEP = "\t"  # FIXME: all usages of this should be changed to something smart
+  FIELD_PREFIX = "_"  # FIXME: all usages of this should be changed to something smart
 end
 
 %w{

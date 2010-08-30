@@ -59,6 +59,11 @@ module XDry
       @implementations << child.bind(self)
     end
 
+    def main_interface
+      # FIXME
+      @interfaces.first
+    end
+
     def main_implementation
       # FIXME
       @implementations.first
@@ -141,7 +146,11 @@ module XDry
     end
 
     def field_name
-      @field_def.name
+      if @field_def
+        @field_def.name
+      else
+        FIELD_PREFIX + name
+      end
     end
 
     def add_field_def! field_def
@@ -173,7 +182,7 @@ module XDry
     end
 
     def new_field_def
-      NFieldDef.new(name, type)
+      NFieldDef.new(field_name, type)
     end
 
     def new_synthesize

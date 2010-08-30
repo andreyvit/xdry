@@ -9,7 +9,7 @@ def xdry gens, content
   config.verbose = ((ENV['VERBOSE'] || '0').to_i != 0)
 
   gens = [gens] if gens.is_a?(Symbol)
-  config.enable_only = gens.collect { |g| g.to_s }
+  config.enable_only = gens.collect { |g| g.to_s.gsub('_', '-') }
 
   first_line_indent = content.split("\n", 2).first.gsub(/\S.*$/, '')
   deleted_indent    = first_line_indent.sub(/\s\s$/, '-( |$)')
@@ -31,6 +31,7 @@ def xdry gens, content
 
   result = XDry.test_run({'main.m' => orig_content}, config)['main.m']
   result = orig_content if result.nil?
+  result = result.gsub("\t", "  ")  # tests use 2 spaces for indentation
 
   result.should == new_content
 end

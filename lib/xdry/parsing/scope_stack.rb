@@ -15,6 +15,7 @@ module XDry
         unless node.nil?  # to simply code we allow the parser to yield nil when it cannot parse something
           # update the scope based on this new node
           while @current_scope.ends_after? node
+            @current_scope << node
             pop
           end
           if subscope = @current_scope.subscope_for(node)

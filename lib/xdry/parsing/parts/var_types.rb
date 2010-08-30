@@ -16,6 +16,12 @@ module XDry
         raise StandardError, "Cannot parse Obj-C type: '#{type_decl}'"
       end
     end
+
+    def to_source_with_space
+      needs_space? ? "#{to_s} " : "#{to_s}"
+    end
+
+    def needs_space?; true; end
   end
 
   class IdVarType < VarType
@@ -51,6 +57,8 @@ module XDry
     def to_s
       "#{@name} *"
     end
+
+    def needs_space?; false; end
 
     def default_property_retainment_policy; 'retain'; end
   end

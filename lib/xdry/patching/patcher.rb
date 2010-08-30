@@ -10,15 +10,16 @@ module XDry
       @dry_run = true
     end
 
-    def insert_after pos, new_lines
-      do_insert_after pos.file_ref, pos.line_no - 1, new_lines
+    def insert_after pos, new_lines, indent = ''
+      do_insert_after pos.file_ref, pos.line_no - 1, new_lines, indent
     end
 
-    def insert_before pos, new_lines
-      do_insert_after pos.file_ref, pos.line_no - 2, new_lines
+    def insert_before pos, new_lines, indent = ''
+      do_insert_after pos.file_ref, pos.line_no - 2, new_lines, indent
     end
 
-    def do_insert_after file_ref, line_index, new_lines
+    def do_insert_after file_ref, line_index, new_lines, indent
+      new_lines = new_lines.collect { |line| line.blank? ? line : indent + line }
       lines = patched_lines_of(file_ref)
 
       if @verbose

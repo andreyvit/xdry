@@ -9,7 +9,7 @@ module XDry
     end
 
     def read
-      open(file_ref.path) { |f| f.read }
+      open(@path) { |f| f.read }
     end
   end
 

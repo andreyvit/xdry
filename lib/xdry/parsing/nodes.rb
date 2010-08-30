@@ -51,7 +51,7 @@ module XDry
     end
 
     def to_source
-      "#{@type} _#{@name};"
+      "#{@type.to_source_with_space}#{@name};"
     end
   end
 

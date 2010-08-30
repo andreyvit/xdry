@@ -193,6 +193,14 @@ module XDry
   def self.run args
     config = parse_command_line_config(args)
 
+    while Dir.pwd != '/' && Dir['*.xcodeproj'] == []
+      Dir.chdir('..')
+    end
+    if Dir['*.xcodeproj'] == []
+      puts "Cannot find *.xcodeproj in any of the parent directories. Stop."
+      exit 1
+    end
+
     run_once config
 
     if config.watch
