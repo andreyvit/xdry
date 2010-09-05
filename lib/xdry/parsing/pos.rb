@@ -27,6 +27,7 @@ module XDry
 
   class Pos
     attr_reader :file_ref, :line_no
+    attr_accessor :scope_before, :scope_after
 
     def initialize file_ref, line_no
       @file_ref = file_ref

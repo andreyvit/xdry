@@ -11,7 +11,7 @@ end
     parsing/scopes_support parsing/scopes
     parsing/scope_stack parsing/driver
 
-    patching/emitter patching/patcher
+    patching/emitter patching/patcher patching/insertion_points patching/item_patchers
 
     boxing generators_support run
   }.each { |name| require File.join(File.dirname(__FILE__), 'xdry', name) }

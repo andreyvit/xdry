@@ -29,7 +29,7 @@ module XDry
 
     def subscope_for node
       if subscope_class = self.class.child_subscope_table[node.class]
-        subscope_class.new(node)
+        subscope_class.new(self, node)
       else
         nil
       end
@@ -52,6 +52,14 @@ module XDry
 
     def to_s
       "#{self.class.name}:#{@model}"
+    end
+
+    def parent_scopes
+      []
+    end
+
+    def all_scopes
+      parent_scopes + [self]
     end
 
   protected
@@ -118,10 +126,16 @@ module XDry
   class ChildScope < Scope
 
     attr_reader :start_node
+    attr_reader :parent_scope
 
-    def initialize start_node
+    def initialize parent_scope, start_node
       super()
+      @parent_scope = parent_scope
       @start_node = start_node
+    end
+
+    def parent_scopes
+      parent_scope.all_scopes
     end
 
   end

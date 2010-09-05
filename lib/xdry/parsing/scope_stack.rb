@@ -5,9 +5,9 @@ module XDry
 
     attr_accessor :verbose
 
-    def initialize root_scope
+    def initialize root_scopes
       @stack = []
-      push root_scope
+      root_scopes.each { |scope| push(scope) }
     end
 
     def parse_line line, eol_comments
@@ -28,6 +28,10 @@ module XDry
           yield @current_scope, node
         end
       end
+    end
+
+    def current_scope
+      @current_scope
     end
 
   private

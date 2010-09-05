@@ -2,42 +2,24 @@
 module XDry
 module Generators
 
-  class MethodPatcher
-
-    attr_reader :oclass
-    attr_reader :omethod
-
-    def initialize oclass
-      @oclass = oclass
-      find!
-    end
-
-    def found?
-      not omethod.nil?
-    end
-
-  protected
-
-    def find
-    end
-
-    def find_method_impl_by_selector selector
-      m = oclass.find_method(selector)
-      m && (m.has_impl? ? m : nil)
-    end
-
-  private
-
-    def find!
-      @omethod = find
-    end
-
-  end
-
   class DeallocMethodPatcher < MethodPatcher
 
     def find
       find_method_impl_by_selector('dealloc')
+    end
+
+    def empty_implementation
+      [
+        "",
+        "- (void)dealloc {",
+        "\t[super dealloc];",
+        "}",
+        "",
+      ]
+    end
+
+    def insertion_point
+      ImplementationStartIP.new(oclass)
     end
 
   end
@@ -47,7 +29,7 @@ module Generators
 
     def process_class oclass
 
-      dealloc_method_area = DeallocMethodPatcher.new(oclass)
+      dealloc_method_area = DeallocMethodPatcher.new(oclass, patcher)
       if dealloc_method_area.found?
         dealloc_method = dealloc_method_area.omethod
         impl = dealloc_method.impl
@@ -66,14 +48,6 @@ module Generators
         lines = lines.collect { |l| indent + l }
 
         @patcher.insert_before ending_node.pos, lines unless lines.empty?
-      else
-        lines = generate_release_calls_if(oclass) { true }
-        unless lines.empty?
-          lines = ["", "- (void)dealloc {"] + lines.collect { |l| INDENT_STEP+l } +
-              [INDENT_STEP + "[super dealloc];", "}", ""]
-          node = oclass.main_implementation.start_node
-          @patcher.insert_after node.pos, lines
-        end
       end
     end
 

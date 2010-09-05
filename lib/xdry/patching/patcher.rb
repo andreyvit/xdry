@@ -11,15 +11,16 @@ module XDry
     end
 
     def insert_after pos, new_lines, indent = ''
-      do_insert_after pos.file_ref, pos.line_no - 1, new_lines, indent
+      do_insert_after pos.file_ref, pos.scope_after, pos.line_no - 1, new_lines, indent
     end
 
     def insert_before pos, new_lines, indent = ''
-      do_insert_after pos.file_ref, pos.line_no - 2, new_lines, indent
+      do_insert_after pos.file_ref, pos.scope_before, pos.line_no - 2, new_lines, indent
     end
 
-    def do_insert_after file_ref, line_index, new_lines, indent
+    def do_insert_after file_ref, start_scope, line_index, new_lines, indent
       new_lines = new_lines.collect { |line| line.blank? ? line : indent + line }
+      new_lines = new_lines.collect { |line| line.gsub("\t", INDENT_STEP) }
       lines = patched_lines_of(file_ref)
 
       if @verbose
@@ -48,6 +49,10 @@ module XDry
       new_lines = new_lines[0 .. -(trailing_lines_to_remove+1)]
 
       lines[line_index+1 .. line_index+1] = new_lines.collect { |line| "#{line}\n" } + [lines[line_index+1]]
+
+      driver = ParsingDriver.new(nil)
+      driver.verbose = @verbose
+      driver.parse_fragment file_ref, new_lines, line_index+1+1, start_scope
     end
 
     def save!

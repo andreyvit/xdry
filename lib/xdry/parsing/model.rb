@@ -32,6 +32,7 @@ module XDry
   end
 
   class OClass
+    attr_reader :oglobal
     attr_reader :name, :field_defs, :attributes, :methods
     attr_reader :interfaces
     attr_reader :implementations
