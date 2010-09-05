@@ -48,6 +48,8 @@ module XDry
       trailing_lines_to_remove     = [actual_trailing_empty_lines, desired_trailing_empty_lines].min
       new_lines = new_lines[0 .. -(trailing_lines_to_remove+1)]
 
+      file_ref.fixup_positions! line_index+1, new_lines.size
+
       lines[line_index+1 .. line_index+1] = new_lines.collect { |line| "#{line}\n" } + [lines[line_index+1]]
 
       driver = ParsingDriver.new(nil)
