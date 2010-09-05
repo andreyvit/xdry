@@ -55,6 +55,9 @@ module XDry
       when /^(\w+)\s*\*\s*(\w+)\s*;/
         type_name, field_name = $1, $2
         yield process_type_hint(NFieldDef.new(field_name, PointerVarType.new(type_name)), eol_comments)
+      when /^id<(\w+)>\s+(\w+)\s*;/
+        type_name, field_name = $1, $2
+        yield process_type_hint(NFieldDef.new(field_name, IdVarType.new()), eol_comments)
       end
     end
 
