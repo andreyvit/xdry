@@ -61,19 +61,19 @@ module Generators
       define_ip = MultiIP.new(AfterDefineIP.new(oclass.main_implementation.parent_scope), BeforeImplementationStartIP.new(oclass))
       define_ip.insert @patcher, [""] + defines_emitter.lines + [""]
 
+      MethodPatcher.new(patcher, oclass, 'dictionaryRepresentation', ImplementationStartIP.new(oclass), repr_code) do |omethod|
+        impl = omethod.impl
+        ip = BeforeReturnIP.new(impl)
+
+        ip.insert @patcher, repr_out.lines unless repr_out.empty?
+      end
+
       MethodPatcher.new(patcher, oclass, 'initWithDictionary:', ImplementationStartIP.new(oclass), init_code) do |omethod|
         impl = omethod.impl
         ip = AfterSuperCallWithIndentIP.new(impl)
         var_name = impl.start_node.selector_def.var_name_after_keyword('initWithDictionary:')
 
         ip.insert @patcher, init_out.lines.collect { |l| l.gsub(/\bdictionary\b/, var_name) } unless init_out.empty?
-      end
-
-      MethodPatcher.new(patcher, oclass, 'dictionaryRepresentation', ImplementationStartIP.new(oclass), repr_code) do |omethod|
-        impl = omethod.impl
-        ip = BeforeReturnIP.new(impl)
-
-        ip.insert @patcher, repr_out.lines unless repr_out.empty?
       end
     end
 
