@@ -37,7 +37,7 @@ module XDry
       @indent = @indent + INDENT_STEP
     end
 
-    def indeted_after node
+    def indented_after node
       after node
       @indent = @indent + INDENT_STEP
     end
@@ -69,6 +69,19 @@ module XDry
 
   end
 
+  class BeforeImplementationStartIP < InsertionPoint
+
+    def initialize oclass
+      @oclass = oclass
+      super()
+    end
+
+    def find!
+      before @oclass.main_implementation.start_node
+    end
+
+  end
+
   class BeforeSuperCallIP < InsertionPoint
 
     def initialize scope
@@ -87,10 +100,63 @@ module XDry
 
   end
 
+  class BeforeReturnIP < InsertionPoint
+
+    def initialize scope
+      @scope = scope
+      super()
+    end
+
+    def find!
+      child_node = @scope.children.find { |child| child.is_a? NReturn }
+      if child_node.nil?
+        before @scope.ending_node
+      else
+        before child_node
+      end
+    end
+
+  end
+
+  class AfterDefineIP < InsertionPoint
+
+    def initialize scope
+      @scope = scope
+      super()
+    end
+
+    def find!
+      child_nodes = @scope.children.select { |child| child.is_a? NDefine }
+      unless child_nodes.empty?
+        after child_nodes.last
+      end
+    end
+
+  end
+
+  class AfterSuperCallWithIndentIP < InsertionPoint
+
+    def initialize scope
+      @scope = scope
+      super()
+    end
+
+    def find!
+      child_node = @scope.children.find { |child| child.is_a? NSuperCall }
+      if child_node.nil?
+        indented_before @scope.ending_node
+      else
+        indented_after child_node
+      end
+    end
+
+  end
+
   class MultiIP < InsertionPoint
 
     def initialize *insertion_points
       @insertion_points = insertion_points
+      super()
     end
 
     def find!

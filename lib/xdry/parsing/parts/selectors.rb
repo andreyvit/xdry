@@ -33,6 +33,10 @@ module XDry
 
     def simple?; true; end
 
+    def var_name_after_keyword keyword
+      nil
+    end
+
     def to_s
       @selector
     end
@@ -79,6 +83,11 @@ module XDry
 
     def to_s
       @components.collect { |comp| comp.to_s }.join(" ")
+    end
+
+    def var_name_after_keyword keyword
+      comp = @components.find { |comp| comp.keyword == keyword }
+      comp && comp.arg_name
     end
 
   end

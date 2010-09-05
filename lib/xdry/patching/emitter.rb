@@ -5,8 +5,14 @@ module XDry
 
     def initialize
       @lines = []
-      @indent = "    "
+      @indent = "\t"
       @current_indent = ""
+    end
+
+    def self.capture
+      emitter = Emitter.new
+      yield emitter
+      return emitter.lines
     end
 
     def << line

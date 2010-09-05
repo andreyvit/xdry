@@ -11,11 +11,11 @@ module XDry
     end
 
     def insert_after pos, new_lines, indent = ''
-      do_insert_after pos.file_ref, pos.scope_after, pos.line_no - 1, new_lines, indent
+      do_insert_after pos.file_ref, pos.scope_after, pos.line_no - 1, new_lines, indent || ''
     end
 
     def insert_before pos, new_lines, indent = ''
-      do_insert_after pos.file_ref, pos.scope_before, pos.line_no - 2, new_lines, indent
+      do_insert_after pos.file_ref, pos.scope_before, pos.line_no - 2, new_lines, indent || ''
     end
 
     def do_insert_after file_ref, start_scope, line_index, new_lines, indent

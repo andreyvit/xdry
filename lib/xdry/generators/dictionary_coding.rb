@@ -43,19 +43,37 @@ module Generators
         repr_out << %Q`[dictionary setObject:#{boxed} forKey:#{key_const}];`
       end
 
-      out << defines_emitter
-
-      out.method "(id) initWithDictionary:(NSDictionary *)#{dictionary_var}" do
-        out.if "self = [super init]" do
-          out << init_out
+      init_code = Emitter.capture do |o|
+        o.method "(id)initWithDictionary:(NSDictionary *)#{dictionary_var}" do
+          o.if "self = [super init]" do
+          end
+          o << "return self;"
         end
-        out << "return self;"
       end
 
-      out.method "(NSDictionary *) dictionaryRepresentation" do
-        out << "NSMutableDictionary *#{dictionary_var} = [NSMutableDictionary dictionary];"
-        out << repr_out
-        out << "return #{dictionary_var};"
+      repr_code = Emitter.capture do |o|
+        o.method "(NSDictionary *)dictionaryRepresentation" do
+          o << "NSMutableDictionary *#{dictionary_var} = [NSMutableDictionary dictionary];"
+          o << "return #{dictionary_var};"
+        end
+      end
+
+      define_ip = MultiIP.new(AfterDefineIP.new(oclass.main_implementation.parent_scope), BeforeImplementationStartIP.new(oclass))
+      define_ip.insert @patcher, [""] + defines_emitter.lines + [""]
+
+      MethodPatcher.new(patcher, oclass, 'initWithDictionary:', ImplementationStartIP.new(oclass), init_code) do |omethod|
+        impl = omethod.impl
+        ip = AfterSuperCallWithIndentIP.new(impl)
+        var_name = impl.start_node.selector_def.var_name_after_keyword('initWithDictionary:')
+
+        ip.insert @patcher, init_out.lines.collect { |l| l.gsub(/\bdictionary\b/, var_name) } unless init_out.empty?
+      end
+
+      MethodPatcher.new(patcher, oclass, 'dictionaryRepresentation', ImplementationStartIP.new(oclass), repr_code) do |omethod|
+        impl = omethod.impl
+        ip = BeforeReturnIP.new(impl)
+
+        ip.insert @patcher, repr_out.lines unless repr_out.empty?
       end
     end
 

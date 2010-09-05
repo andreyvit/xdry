@@ -203,4 +203,15 @@ module XDry
   class NSuperCall < Node
   end
 
+  class NReturn < Node
+  end
+
+  class NDefine < Node
+    attr_reader :word
+
+    def initialize word
+      @word = word
+    end
+  end
+
 end

@@ -34,7 +34,7 @@ module XDry
       if @item.nil?
         patch!
         @item = find
-        raise AssertionError, "#{seld.class.name} cannot find item even after adding a new one" if @item.nil?
+        raise StandardError, "#{self.class.name} cannot find item even after adding a new one" if @item.nil?
       end
     end
 

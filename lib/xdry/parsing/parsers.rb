@@ -30,6 +30,10 @@ module XDry
 
         when /^@protocol\s+(\w+)\s*;/
           puts "PREDEF protocol #{$1}"
+
+        when /^#define\s+(\w+)/
+          word = $1
+          yield NDefine.new(word)
       end
     end
 
@@ -124,6 +128,8 @@ module XDry
         yield NReleaseCall.new(expr)
       when /\[super\s/
         yield NSuperCall.new
+      when /^return\b/
+        yield NReturn.new
       end
     end
 
