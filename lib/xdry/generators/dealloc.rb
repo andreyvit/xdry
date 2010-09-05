@@ -2,34 +2,20 @@
 module XDry
 module Generators
 
-  class DeallocMethodPatcher < MethodPatcher
-
-    def find
-      find_method_impl_by_selector('dealloc')
-    end
-
-    def empty_implementation
-      [
-        "",
-        "- (void)dealloc {",
-        "\t[super dealloc];",
-        "}",
-        "",
-      ]
-    end
-
-    def insertion_point
-      ImplementationStartIP.new(oclass)
-    end
-
-  end
+  DEALLOC_CODE = [
+    "",
+    "- (void)dealloc {",
+    "\t[super dealloc];",
+    "}",
+    "",
+  ]
 
   class Dealloc < Generator
     id "dealloc"
 
     def process_class oclass
 
-      DeallocMethodPatcher.new(oclass, patcher) do |dealloc_method|
+      MethodPatcher.new(patcher, oclass, 'dealloc', ImplementationStartIP.new(oclass), DEALLOC_CODE) do |dealloc_method|
         impl = dealloc_method.impl
         ip = BeforeSuperCallIP.new(impl)
 

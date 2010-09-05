@@ -1,21 +1,19 @@
 
 module XDry
 
-  class MethodPatcher
+  class ItemPatcher
 
-    attr_reader :oclass
-    attr_reader :omethod
+    attr_reader :item
     attr_reader :patcher
 
-    def initialize oclass, patcher
-      @oclass = oclass
+    def initialize patcher
       @patcher = patcher
       find!
-      yield @omethod if block_given? && found?
+      yield @item if block_given? && found?
     end
 
     def found?
-      not omethod.nil?
+      not item.nil?
     end
 
   protected
@@ -23,24 +21,52 @@ module XDry
     def find
     end
 
-    def find_method_impl_by_selector selector
-      m = oclass.find_method(selector)
-      m && (m.has_impl? ? m : nil)
+    def insertion_point
+    end
+
+    def new_code
     end
 
   private
 
     def find!
-      @omethod = find
-      if @omethod.nil?
+      @item = find
+      if @item.nil?
         patch!
-        @omethod = find
-        raise AssertionError, "#{seld.class.name} cannot find method even after adding a new one" if @omethod.nil?
+        @item = find
+        raise AssertionError, "#{seld.class.name} cannot find item even after adding a new one" if @item.nil?
       end
     end
 
     def patch!
-      insertion_point.insert patcher, empty_implementation
+      insertion_point.insert patcher, new_code
+    end
+
+  end
+
+  class MethodPatcher < ItemPatcher
+
+    attr_reader :oclass
+    attr_reader :insertion_point
+    attr_reader :new_code
+
+    def initialize patcher, oclass, selector, insertion_point, new_code
+      @oclass = oclass
+      @selector = selector
+      @insertion_point = insertion_point
+      @new_code = new_code
+      super(patcher)
+    end
+
+  protected
+
+    def find
+      find_method_impl_by_selector(@selector)
+    end
+
+    def find_method_impl_by_selector selector
+      m = oclass.find_method(selector)
+      m && (m.has_impl? ? m : nil)
     end
 
   end
