@@ -189,6 +189,9 @@ module XDry
   class NOpeningBrace < Node
   end
 
+  class NClosingBrace < Node
+  end
+
   class NMethodEnd < Node
   end
 
@@ -212,6 +215,16 @@ module XDry
     def initialize word
       @word = word
     end
+  end
+
+  class NLine < Node
+
+    attr_reader :line
+
+    def initialize line
+      @line = line
+    end
+
   end
 
 end

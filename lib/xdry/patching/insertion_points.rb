@@ -3,7 +3,7 @@ module XDry
 
   class InsertionPoint
 
-    attr_reader :method, :node
+    attr_reader :method, :node, :ip
 
     def initialize
       find!
@@ -11,7 +11,7 @@ module XDry
 
     def insert patcher, lines
       raise StandardError, "#{self.class.name} has not been found but trying to insert" unless found?
-      patcher.send(@method, @node.pos, lines, @indent)
+      patcher.send(@method, @node.pos, wrap(lines), @indent)
     end
 
     def found?
@@ -19,6 +19,10 @@ module XDry
     end
 
   protected
+
+    def wrap lines
+      lines
+    end
 
     def before node
       @method = :insert_before
@@ -44,7 +48,7 @@ module XDry
 
     def try insertion_point
       if insertion_point.found?
-        @method, @node = insertion_point.method, insertion_point.node
+        @method, @node, @ip = insertion_point.method, insertion_point.node, insertion_point
         true
       else
         false
@@ -134,7 +138,7 @@ module XDry
 
   end
 
-  class AfterSuperCallWithIndentIP < InsertionPoint
+  class InsideConstructorIfSuperIP < InsertionPoint
 
     def initialize scope
       @scope = scope
@@ -142,11 +146,16 @@ module XDry
     end
 
     def find!
-      child_node = @scope.children.find { |child| child.is_a? NSuperCall }
-      if child_node.nil?
+      if_start_node = @scope.children.find { |child| child.is_a? NSuperCall }
+      if if_start_node.nil?
         indented_before @scope.ending_node
       else
-        indented_after child_node
+        if_end_node = @scope.children.find { |child| child.is_a?(NClosingBrace) && child.indent == if_start_node.indent }
+        if if_end_node.nil?
+          indented_after if_start_node
+        else
+          indented_before if_end_node
+        end
       end
     end
 
@@ -156,11 +165,30 @@ module XDry
 
     def initialize *insertion_points
       @insertion_points = insertion_points
+      @last_before = []
+      @last_after  = []
       super()
+    end
+
+    def wrap_if_last! before, after
+      @last_before = before
+      @last_after  = after
+    end
+
+    def wrap_with_empty_lines_if_last!
+      wrap_if_last! [""], [""]
     end
 
     def find!
       @insertion_points.detect { |ip| try ip }
+    end
+
+    def wrap lines
+      if @ip == @insertion_points.last
+        @last_before + lines + @last_after
+      else
+        lines
+      end
     end
 
   end

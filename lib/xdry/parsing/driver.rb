@@ -49,7 +49,7 @@ module XDry
         orig_line, line, pos, eol_comments, indent = gen.next
         puts "        #{pos} #{orig_line}" if @verbose
         pos.scope_before = scope_stack.current_scope
-        scope_stack.parse_line line, eol_comments do |scope, child|
+        scope_stack.parse_line line, eol_comments, indent do |scope, child|
           # child is a Node or a Scope
           if child.is_a? Node
             child.pos = pos

@@ -4,6 +4,12 @@ module XDry
 
   class Parser
 
+    attr_reader :scope
+
+    def initialize scope
+      @scope = scope
+    end
+
     def to_s
       "#{self.class.name}"
     end
@@ -12,7 +18,7 @@ module XDry
 
   class PGlobal < Parser
 
-    def parse_line! line, eol_comments
+    def parse_line! line, eol_comments, indent
       case line
         when /^@interface\s+(\w+)\s*;/
           name = $1
@@ -41,11 +47,12 @@ module XDry
 
   class PInterfaceFields < Parser
 
-    def initialize
+    def initialize scope
+      super
       @tags = Set.new
     end
 
-    def parse_line! line, eol_comments
+    def parse_line! line, eol_comments, indent
       case line
       when /\}/
         yield NInterfaceFieldsEnd.new
@@ -83,7 +90,7 @@ module XDry
 
   class PInterfaceHeader < Parser
 
-    def parse_line! line, eol_comments
+    def parse_line! line, eol_comments, indent
       case line
       when /^\{$/
         yield NOpeningBrace.new
@@ -116,10 +123,14 @@ module XDry
 
   class PMethodImpl < Parser
 
-    def parse_line! line, eol_comments
+    def parse_line! line, eol_comments, indent
       case line
       when /^\}$/
-        yield NMethodEnd.new
+        if indent == scope.start_node.indent
+          yield NMethodEnd.new
+        else
+          yield NClosingBrace.new
+        end
       when /\[\s*([\w.]+)\s+release\s*\]/
         expr = $1
         yield NReleaseCall.new(expr)

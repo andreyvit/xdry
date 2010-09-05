@@ -10,8 +10,8 @@ module XDry
       root_scopes.each { |scope| push(scope) }
     end
 
-    def parse_line line, eol_comments
-      @current_scope.parser.parse_line! line, eol_comments do |node|
+    def parse_line line, eol_comments, indent
+      parse_line_using_parser! line, eol_comments, indent do |node|
         unless node.nil?  # to simply code we allow the parser to yield nil when it cannot parse something
           # update the scope based on this new node
           while @current_scope.ends_after? node
@@ -35,6 +35,17 @@ module XDry
     end
 
   private
+
+    def parse_line_using_parser! line, eol_comments, indent
+      parsed = false
+      @current_scope.parser.parse_line! line, eol_comments, indent do |node|
+        parsed = true
+        yield node
+      end
+      unless parsed
+        yield NLine.new(line)
+      end
+    end
 
     def push subscope
       raise StandardError, "Attempted to push a nil subscope" if subscope.nil?

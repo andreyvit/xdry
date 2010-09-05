@@ -65,7 +65,7 @@ module XDry
   protected
 
     def create_parser
-      return self.class.parser_class.new if self.class.parser_class
+      return self.class.parser_class.new(self) if self.class.parser_class
       raise StandardError, "#{self.class.name} does not override create_parser"
     end
 
