@@ -91,10 +91,8 @@ What XD.R.Y. already does
 Changes patched live into the sources:
 
 * add missing `@synthesize` declarations for your properties
-
-Collected in `xdry.m`:
-
-* implement of `- (id)initWithDictionary:(NSDictionary *)dict` and `- (NSDictionary *)dictionaryRepresentation` for your classes. To get this to work, you need to add `// persistent` comment before the fields you want to persist, e.g.:
+* add missing release calls to `dealloc`
+* add `initWithDictionary:` and `dictionaryRepresentation` methods for classes that have some fields marked with `// persistent` comment, like this:
 
         @interface MyTag : NSObject {
         	// persistent
@@ -104,7 +102,9 @@ Collected in `xdry.m`:
         	NSString *_other; // this won't be saved/restored since an empty line resets the 'persistent' mode
         }
 
-* implement `dealloc`
+* add missing field declarations for properties (unless those have getters implemented as methods)
+
+Collected in `xdry.m`:
 
 * declare properties for all your fields that don't yet have properties declared (you can copy and paste those into your project)
 
