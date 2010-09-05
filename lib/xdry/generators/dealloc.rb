@@ -2,13 +2,54 @@
 module XDry
 module Generators
 
+  class MethodPatcher
+
+    attr_reader :oclass
+    attr_reader :omethod
+
+    def initialize oclass
+      @oclass = oclass
+      find!
+    end
+
+    def found?
+      not omethod.nil?
+    end
+
+  protected
+
+    def find
+    end
+
+    def find_method_impl_by_selector selector
+      m = oclass.find_method(selector)
+      m && (m.has_impl? ? m : nil)
+    end
+
+  private
+
+    def find!
+      @omethod = find
+    end
+
+  end
+
+  class DeallocMethodPatcher < MethodPatcher
+
+    def find
+      find_method_impl_by_selector('dealloc')
+    end
+
+  end
+
   class Dealloc < Generator
     id "dealloc"
 
     def process_class oclass
 
-      dealloc_method = oclass.find_method('dealloc')
-      if dealloc_method && dealloc_method.has_impl?
+      dealloc_method_area = DeallocMethodPatcher.new(oclass)
+      if dealloc_method_area.found?
+        dealloc_method = dealloc_method_area.omethod
         impl = dealloc_method.impl
         ending_node = impl.children.find { |child| child.is_a? NSuperCall }
         if ending_node.nil?
