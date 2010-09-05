@@ -11,6 +11,7 @@ module XDry
       @oclass = oclass
       @patcher = patcher
       find!
+      yield @omethod if block_given? && found?
     end
 
     def found?

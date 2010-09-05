@@ -11,7 +11,7 @@ module XDry
 
     def insert patcher, lines
       raise StandardError, "#{self.class.name} has not been found but trying to insert" unless found?
-      patcher.send(@method, @node.pos, lines)
+      patcher.send(@method, @node.pos, lines, @indent)
     end
 
     def found?
@@ -23,11 +23,23 @@ module XDry
     def before node
       @method = :insert_before
       @node = node
+      @indent = node.indent
     end
 
     def after node
       @method = :insert_after
       @node = node
+      @indent = node.indent
+    end
+
+    def indented_before node
+      before node
+      @indent = @indent + INDENT_STEP
+    end
+
+    def indeted_after node
+      after node
+      @indent = @indent + INDENT_STEP
     end
 
     def try insertion_point
@@ -53,6 +65,24 @@ module XDry
 
     def find!
       after @oclass.main_implementation.start_node
+    end
+
+  end
+
+  class BeforeSuperCallIP < InsertionPoint
+
+    def initialize scope
+      @scope = scope
+      super()
+    end
+
+    def find!
+      child_node = @scope.children.find { |child| child.is_a? NSuperCall }
+      if child_node.nil?
+        indented_before @scope.ending_node
+      else
+        before child_node
+      end
     end
 
   end

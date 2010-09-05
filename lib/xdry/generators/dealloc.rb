@@ -29,25 +29,16 @@ module Generators
 
     def process_class oclass
 
-      dealloc_method_area = DeallocMethodPatcher.new(oclass, patcher)
-      if dealloc_method_area.found?
-        dealloc_method = dealloc_method_area.omethod
+      DeallocMethodPatcher.new(oclass, patcher) do |dealloc_method|
         impl = dealloc_method.impl
-        ending_node = impl.children.find { |child| child.is_a? NSuperCall }
-        if ending_node.nil?
-          ending_node = impl.end_node
-          indent = ending_node.indent + INDENT_STEP
-        else
-          indent = ending_node.indent
-        end
+        ip = BeforeSuperCallIP.new(impl)
 
         existing_releases = impl.children.select { |child| child.is_a? NReleaseCall }
         lines = generate_release_calls_if(oclass) do |oattr|
           !existing_releases.any? { |n| n.expr == oattr.field_name || n.expr == "self.#{oattr.name}" }
         end
-        lines = lines.collect { |l| indent + l }
 
-        @patcher.insert_before ending_node.pos, lines unless lines.empty?
+        ip.insert @patcher, lines unless lines.empty?
       end
     end
 
