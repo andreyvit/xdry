@@ -170,7 +170,9 @@ module XDry
       'NSUInteger' => NSNumberConverter.new('unsignedIntegerValue', 'numberWithUnsignedInteger'),
       'BOOL' => NSNumberConverter.new('boolValue', 'numberWithBool'),
       'float' => NSNumberConverter.new('floatValue', 'numberWithFloat'),
+      'CGFloat' => NSNumberConverter.new('floatValue', 'numberWithFloat'),
       'double' => NSNumberConverter.new('doubleValue', 'numberWithDouble'),
+      'NSTimeInterval' => NSNumberConverter.new('doubleValue', 'numberWithDouble'),
     }
 
     POINTER_CONVERTIONS = {

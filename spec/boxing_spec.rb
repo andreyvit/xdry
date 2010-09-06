@@ -61,4 +61,20 @@ describe "boxing support" do
     END
   end
 
+  it "should box NSTimeInterval as double via NSNumber" do
+    box <<-END
+      - (id)box:(NSTimeInterval)foo {
+        return [NSNumber numberWithDouble:foo];
+      }
+    END
+  end
+
+  it "should box CGFloat as float via NSNumber" do
+    box <<-END
+      - (id)box:(CGFloat)foo {
+        return [NSNumber numberWithFloat:foo];
+      }
+    END
+  end
+
 end
