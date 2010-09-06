@@ -5,10 +5,12 @@ module XDry
 
   class ParsingDriver
     attr_accessor :verbose
+    attr_reader :markers
 
     def initialize oglobal
       @oglobal = oglobal
       @verbose = false
+      @markers = []
     end
 
     def parse_file file_name
@@ -54,6 +56,9 @@ module XDry
           if child.is_a? Node
             child.pos = pos
             child.indent = indent
+          end
+          if child.is_a? NMarker
+            @markers << child
           end
 
           puts "#{scope} << #{child}" if @verbose

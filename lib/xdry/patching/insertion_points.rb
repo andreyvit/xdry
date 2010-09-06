@@ -86,6 +86,19 @@ module XDry
 
   end
 
+  class BeforeInterfaceEndIP < InsertionPoint
+
+    def initialize oclass
+      @oclass = oclass
+      super()
+    end
+
+    def find!
+      before @oclass.main_interface.end_node
+    end
+
+  end
+
   class BeforeSuperCallIP < InsertionPoint
 
     def initialize scope

@@ -20,6 +20,10 @@ module XDry
       @tags.include? tag
     end
 
+    def tags_comment
+      if @tags.empty? then "" else " // " + @tags.to_a.sort.join(", ") end
+    end
+
     def method_missing id, *args, &block
       if id.to_s =~ /^with_(.*)$/
         send("#{$1}=", *args, &block)
@@ -46,8 +50,12 @@ module XDry
       tagged_with? 'persistent'
     end
 
+    def wants_property?
+      tagged_with? 'wants-property'
+    end
+
     def to_s
-      "#{@type} #{@name}"
+      "#{@type} #{@name}#{tags_comment}"
     end
 
     def to_source
@@ -78,7 +86,7 @@ module XDry
         else ', ' + @type.default_property_retainment_policy
       end
       iboutlet = if outlet? then "IBOutlet " else '' end
-      "@property(nonatomic#{retainment}) #{iboutlet}#{@type} #{@name};"
+      "@property(nonatomic#{retainment}) #{iboutlet}#{@type.to_source_with_space}#{@name};"
     end
   end
 
@@ -225,6 +233,24 @@ module XDry
       @line = line
     end
 
+  end
+
+  class NMarker < Node
+    attr_reader :text
+
+    def initialize text
+      @text = text
+    end
+
+    def to_s
+      "#{self.class.name}('#{text}')"
+    end
+  end
+
+  class NPartLineMarker < NMarker
+  end
+
+  class NFullLineMarker < NMarker
   end
 
 end

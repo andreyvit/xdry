@@ -147,14 +147,15 @@ module XDry
   def self.run_once config
     oglobal = OGlobal.new
 
+    parser = ParsingDriver.new(oglobal)
+    parser.verbose = config.verbose
+
     Dir["**/*.m"].each do |m_file|
       next if config.only and not File.fnmatch(config.only, m_file)
       h_file = m_file.sub /\.m$/, '.h'
       if File.file? h_file
         puts h_file if config.verbose
 
-        parser = ParsingDriver.new(oglobal)
-        parser.verbose = config.verbose
         parser.parse_file(h_file)
         parser.parse_file(m_file)
       end
@@ -163,6 +164,8 @@ module XDry
     patcher = Patcher.new
     patcher.dry_run = config.dry_run
     patcher.verbose = config.verbose
+
+    parser.markers.each { |marker| patcher.remove_marker! marker }
 
     out_file_name = 'xdry.m'
     open(out_file_name, 'w') do |out_file|
@@ -183,6 +186,8 @@ module XDry
 
     patcher = Patcher.new
     patcher.verbose = config.verbose
+
+    parser.markers.each { |marker| patcher.remove_marker! marker }
 
     out_file = StringIO.new
     self.produce_everything(out_file, oglobal, patcher, config)

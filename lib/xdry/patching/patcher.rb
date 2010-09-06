@@ -10,21 +10,44 @@ module XDry
       @dry_run = true
     end
 
-    def insert_after pos, new_lines, indent = ''
-      do_insert_after pos.file_ref, pos.scope_after, pos.line_no - 1, new_lines, indent || ''
+    def insert_after pos, new_lines, indent = '', parse = true
+      do_insert_after pos.file_ref, pos.scope_after, pos.line_no - 1, new_lines, indent || '', parse
     end
 
-    def insert_before pos, new_lines, indent = ''
-      do_insert_after pos.file_ref, pos.scope_before, pos.line_no - 2, new_lines, indent || ''
+    def insert_before pos, new_lines, indent = '', parse = true
+      do_insert_after pos.file_ref, pos.scope_before, pos.line_no - 2, new_lines, indent || '', parse
     end
 
-    def do_insert_after file_ref, start_scope, line_index, new_lines, indent
+    def delete_line pos
+      do_delete_lines pos.file_ref, pos.line_no - 1, 1
+    end
+
+    def replace_line pos
+      old_line = patched_lines_of(pos.file_ref)[pos.line_no-1].rstrip
+      new_line = yield(old_line)
+      delete_line pos
+      insert_before pos, [new_line], '', false
+    end
+
+    def do_delete_lines file_ref, line_index, line_count
+      lines = patched_lines_of(file_ref)
+
+      if @verbose
+        puts "DELETING #{line_count} LINE(S) FROM LINE NO.#{line_index+1}:"
+        lines[line_index .. line_index+line_count-1].each { |line| puts "    #{line}" }
+      end
+
+      file_ref.fixup_positions! line_index+1+line_count, -line_count
+      lines[line_index .. line_index+line_count-1] = []
+    end
+
+    def do_insert_after file_ref, start_scope, line_index, new_lines, indent, parse
       new_lines = new_lines.collect { |line| line.blank? ? line : indent + line }
       new_lines = new_lines.collect { |line| line.gsub("\t", INDENT_STEP) }
       lines = patched_lines_of(file_ref)
 
       if @verbose
-        puts "INSERTING LINES:"
+        puts "INSERTING LINES AFTER LINE NO.#{line_index+1}:"
         new_lines.each { |line| puts "    #{line}" }
         puts "  AFTER LINE:"
         puts "    #{lines[line_index]}"
@@ -52,9 +75,11 @@ module XDry
 
       lines[line_index+1 .. line_index+1] = new_lines.collect { |line| "#{line}\n" } + [lines[line_index+1]]
 
-      driver = ParsingDriver.new(nil)
-      driver.verbose = @verbose
-      driver.parse_fragment file_ref, new_lines, line_index+1+1, start_scope
+      if parse
+        driver = ParsingDriver.new(nil)
+        driver.verbose = @verbose
+        driver.parse_fragment file_ref, new_lines, line_index+1+1, start_scope
+      end
     end
 
     def save!
@@ -83,6 +108,16 @@ module XDry
       end
       @patched = {}
       return result
+    end
+
+    def remove_marker! marker
+      if marker.is_a? NFullLineMarker
+        delete_line marker.pos
+      else
+        replace_line marker.pos do |old_line|
+          old_line.gsub(marker.text, '').gsub(/ +$/, '')
+        end
+      end
     end
 
   private

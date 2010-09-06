@@ -25,7 +25,7 @@ module XDry
 
     parse_using PInterfaceHeader
 
-    on NEnd, :pop
+    on NEnd, :pop, :store_into => :end_node
     on NOpeningBrace, :start => SInterfaceFields
     on SInterfaceFields, :store_into => :fields_scope
 

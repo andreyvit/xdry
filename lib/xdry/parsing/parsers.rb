@@ -53,6 +53,15 @@ module XDry
     end
 
     def parse_line! line, eol_comments, indent
+      @this_line_tags = Set.new
+      if line =~ /!p\b/
+        marker = $&
+        is_full_line = line.gsub(marker, '').strip.empty?
+        klass = is_full_line ? NFullLineMarker : NPartLineMarker
+        yield klass.new(marker)
+        (is_full_line ? @tags : @this_line_tags) << 'wants-property'
+        return if is_full_line
+      end
       case line
       when /\}/
         yield NInterfaceFieldsEnd.new
@@ -75,7 +84,7 @@ module XDry
   private
 
     def process_type_hint field_def, eol_comments
-      field_def.tags = @tags.to_a
+      field_def.tags = (@tags + @this_line_tags).to_a
 
       case field_def.type.name
       when 'NSArray'

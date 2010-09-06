@@ -137,6 +137,7 @@ module XDry
 
   class OAttribute
     attr_reader :name
+    attr_reader :field_def
 
     def initialize oclass, name
       @oclass, @name = oclass, name
@@ -196,6 +197,10 @@ module XDry
 
     def type_known?
       not type.nil?
+    end
+
+    def wants_property?
+      has_field_def? && field_def.wants_property?
     end
 
     def getter_selector
