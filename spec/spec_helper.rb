@@ -4,6 +4,11 @@ require 'xdry'
 require 'spec'
 require 'spec/autorun'
 
+def remove_common_indent content
+  first_line_indent = content.split("\n", 2).first.gsub(/\S.*$/, '')
+  content.gsub(/^#{first_line_indent}/, '')
+end
+
 def xdry gens, content
   config = XDry::Config.new
   config.verbose = ((ENV['VERBOSE'] || '0').to_i != 0)
