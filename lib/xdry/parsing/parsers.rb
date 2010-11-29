@@ -86,10 +86,13 @@ module XDry
     def process_type_hint field_def, eol_comments
       field_def.tags = (@tags + @this_line_tags).to_a
 
-      case field_def.type.name
-      when 'NSArray'
-        if eol_comments =~ %r`//\s*of\s+(\w+)`
-          field_def.type.type_hint = $1
+      case field_def.type
+      when PointerVarType
+        case field_def.type.name
+        when 'NSArray'
+          if eol_comments =~ %r`//\s*of\s+(\w+)`
+            field_def.type.type_hint = $1
+          end
         end
       end
 

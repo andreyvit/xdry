@@ -181,14 +181,14 @@ module XDry
     }
 
     def self.converter_for type
-      case type.name
-      when 'NSArray'
-        return ArrayConverter.new(type.type_hint || 'NSObject', 'initWithDictionary', 'dictionaryRepresentation')
-      end
       case type
       when SimpleVarType
         SIMPLE_CONVERTIONS[type.name]
       when PointerVarType
+        case type.name
+        when 'NSArray'
+          return ArrayConverter.new(type.type_hint || 'NSObject', 'initWithDictionary', 'dictionaryRepresentation')
+        end
         POINTER_CONVERTIONS[type.name]
       else
         nil
