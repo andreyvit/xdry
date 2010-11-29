@@ -152,6 +152,7 @@ module XDry
 
     Dir["**/*.m"].each do |m_file|
       next if config.only and not File.fnmatch(config.only, m_file)
+      next if m_file =~ /\.xdry\./
       h_file = m_file.sub /\.m$/, '.h'
       if File.file? h_file
         puts h_file if config.verbose
