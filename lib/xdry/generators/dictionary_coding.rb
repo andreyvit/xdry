@@ -20,10 +20,7 @@ module Generators
         name, type = oattr.name, oattr.type
         field_name = oattr.field_name
         raw_name = "#{name}Raw"
-        capitalized_name = case name
-          when 'id', 'uid' then name.upcase
-          else name[0..0].upcase + name[1..-1]
-          end
+        capitalized_name = name.capitalized_identifier
         key_const = "#{capitalized_name}Key"
 
         type_boxer = Boxing.converter_for type
@@ -112,10 +109,7 @@ module Generators
       oclass.attributes.select { |a| a.persistent? }.each do |oattr|
         name, type = oattr.name, oattr.type
         field_name = oattr.field_name
-        capitalized_name = case name
-          when 'id', 'uid' then name.upcase
-          else name[0..0].upcase + name[1..-1]
-          end
+        capitalized_name = name.capitalized_identifier
         key_const = "#{capitalized_name}Key"
 
         type_boxer = Boxing.converter_for type

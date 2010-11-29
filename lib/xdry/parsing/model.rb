@@ -203,6 +203,10 @@ module XDry
       has_field_def? && field_def.wants_property?
     end
 
+    def wants_constructor?
+      has_field_def? && field_def.wants_constructor?
+    end
+
     def getter_selector
       # FIXME: need to account for a possible selector override declared in @property
       @name
@@ -238,6 +242,10 @@ module XDry
 
     def add_method_impl! method_impl
       @impl = method_impl.bind(self)
+    end
+
+    def has_header?
+      not @header.nil?
     end
 
     def has_impl?

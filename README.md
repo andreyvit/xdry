@@ -103,6 +103,7 @@ Changes patched live into the sources:
         }
 
 * add missing field declarations for properties (unless those have getters implemented as methods)
+* add an initializing constructor for fields marked with `!c`
 
 Collected in `xdry.m`:
 

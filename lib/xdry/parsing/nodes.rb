@@ -54,6 +54,10 @@ module XDry
       tagged_with? 'wants-property'
     end
 
+    def wants_constructor?
+      tagged_with? 'wants-constructor'
+    end
+
     def to_s
       "#{@type} #{@name}#{tags_comment}"
     end

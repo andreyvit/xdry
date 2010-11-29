@@ -37,7 +37,7 @@ module XDry
         lines[line_index .. line_index+line_count-1].each { |line| puts "    #{line}" }
       end
 
-      file_ref.fixup_positions! line_index+1+line_count, -line_count
+      file_ref.fixup_positions! line_index+line_count, -line_count
       lines[line_index .. line_index+line_count-1] = []
     end
 

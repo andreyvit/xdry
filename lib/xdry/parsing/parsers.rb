@@ -54,13 +54,15 @@ module XDry
 
     def parse_line! line, eol_comments, indent
       @this_line_tags = Set.new
-      if line =~ /!p\b/
-        marker = $&
-        is_full_line = line.gsub(marker, '').strip.empty?
-        klass = is_full_line ? NFullLineMarker : NPartLineMarker
-        yield klass.new(marker)
-        (is_full_line ? @tags : @this_line_tags) << 'wants-property'
-        return if is_full_line
+      [[/!p\b/, 'wants-property'], [/!c\b/, 'wants-constructor']].each do |regexp, tag|
+        if line =~ regexp
+          marker = $&
+          is_full_line = line.gsub(marker, '').strip.empty?
+          klass = is_full_line ? NFullLineMarker : NPartLineMarker
+          yield klass.new(marker)
+          (is_full_line ? @tags : @this_line_tags) << tag
+          return if is_full_line
+        end
       end
       case line
       when /\}/
