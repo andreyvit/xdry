@@ -207,7 +207,7 @@ module XDry
       exit 1
     end
 
-    run_once config
+    changed_file_refs = run_once config
 
     if config.watch
       require 'rubygems'
@@ -234,6 +234,13 @@ module XDry
         monitor.create &rebuild
         monitor.update &rebuild
         monitor.delete &rebuild
+      end
+    else
+      if changed_file_refs.empty?
+        puts "No changes."
+      else
+        puts "Modified:"
+        changed_file_refs.each { |ref| puts "-> #{ref.path}" }
       end
     end
   end

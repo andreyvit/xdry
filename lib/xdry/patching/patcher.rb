@@ -83,8 +83,14 @@ module XDry
     end
 
     def save!
+      changed_file_refs = []
       for file_ref, lines in @patched
         original_path = file_ref.path
+
+        text = lines.join("")
+        next if text == file_ref.read
+
+        changed_file_refs << file_ref
 
         new_path = if @dry_run
           ext = File.extname(original_path)
@@ -93,10 +99,8 @@ module XDry
           original_path
         end
 
-        text = lines.join("")
         open(new_path, 'w') { |f| f.write text }
       end
-      changed_file_refs = @patched.keys
       @patched = {}
       return changed_file_refs
     end
