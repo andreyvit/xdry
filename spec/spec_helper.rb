@@ -1,8 +1,8 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'xdry'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
+require 'rspec/autorun'
 
 def remove_common_indent content
   first_line_indent = content.split("\n", 2).first.gsub(/\S.*$/, '')
@@ -41,6 +41,6 @@ def xdry gens, content
   result.should == new_content
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
 
 end
