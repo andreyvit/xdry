@@ -25,7 +25,8 @@ module Generators
 
         type_boxer = Boxing.converter_for type
         if type_boxer.nil?
-          raise StandardError, "Persistence not (yet) supported for type #{type}"
+          puts "Persistence not (yet) supported for type #{type}"
+          next
         end
 
         defines_emitter << %Q`\#define #{key_const} @"#{capitalized_name}"`
@@ -114,7 +115,8 @@ module Generators
 
         type_boxer = Boxing.converter_for type
         if type_boxer.nil?
-          raise StandardError, "Persistence not (yet) supported for type #{type}"
+          puts "Persistence not (yet) supported for type #{type}"
+          next
         end
 
         yield oattr, capitalized_name, key_const, type_boxer
