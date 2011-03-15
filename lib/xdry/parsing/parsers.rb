@@ -151,6 +151,9 @@ module XDry
       when /\bself\s*\.\s*(\w+)\s*=\s*nil\s*[,;]/
         expr = $1
         yield NReleaseCall.new(expr)
+      when /\b(\w+)\s*=\s*nil\s*[,;]/
+        expr = $1
+        yield NReleaseCall.new(expr)
       when /\[super\s/
         yield NSuperCall.new
       when /^return\b/
