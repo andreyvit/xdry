@@ -186,7 +186,7 @@ module XDry
         SIMPLE_CONVERTIONS[type.name]
       when PointerVarType
         case type.name
-        when 'NSArray'
+        when 'NSArray', 'NSMutableArray'
           return ArrayConverter.new(type.type_hint || 'NSObject', 'initWithDictionary', 'dictionaryRepresentation')
         end
         POINTER_CONVERTIONS[type.name]
