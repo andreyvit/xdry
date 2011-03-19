@@ -56,13 +56,13 @@ module Generators
           end
         end
 
-        out << "#{method_header};"
-        out.block "#{method_header}" do
-          out.if "self = [super init]" do
-            out << init_out
-          end
-          out << "return self;"
-        end
+        # out << "#{method_header};"
+        # out.block "#{method_header}" do
+        #   out.if "self = [super init]" do
+        #     out << init_out
+        #   end
+        #   out << "return self;"
+        # end
       end
     end
 
