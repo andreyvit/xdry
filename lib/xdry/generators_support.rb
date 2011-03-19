@@ -9,7 +9,6 @@ module XDry::Generators
   class Generator
 
     attr_reader :patcher
-    attr_accessor :out
 
     def initialize config, patcher
       @config = config

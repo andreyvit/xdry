@@ -2,7 +2,7 @@ require 'optparse'
 
 module XDry
 
-  def self.produce_everything out_file, oglobal, patcher, config
+  def self.produce_everything oglobal, patcher, config
     puts "Generating code... " if config.verbose
 
     generators = Generators::ALL.select { |klass| config.enabled?(klass.id) }.
@@ -32,21 +32,7 @@ module XDry
         end
       end
 
-      out = Emitter.new
-      generators.each { |gen| gen.out = out }
-
       generators.each { |gen| gen.process_class(oclass) }
-
-      unless out.empty?
-        out_file.puts
-        out_file.puts
-        out_file.puts "/" * 79
-        out_file.puts "@implementation #{oclass.name}"
-        out_file.puts
-        out_file.puts out.to_s
-        out_file.puts
-        out_file.puts "@end"
-      end
     end
   end
 
@@ -168,10 +154,7 @@ module XDry
 
     parser.markers.each { |marker| patcher.remove_marker! marker }
 
-    out_file_name = 'xdry.m'
-    open(out_file_name, 'w') do |out_file|
-      self.produce_everything(out_file, oglobal, patcher, config)
-    end
+    self.produce_everything(oglobal, patcher, config)
 
     return patcher.save!
   end
@@ -190,8 +173,7 @@ module XDry
 
     parser.markers.each { |marker| patcher.remove_marker! marker }
 
-    out_file = StringIO.new
-    self.produce_everything(out_file, oglobal, patcher, config)
+    self.produce_everything(oglobal, patcher, config)
 
     return patcher.retrieve!
   end
