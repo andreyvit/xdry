@@ -9,12 +9,19 @@ def remove_common_indent content
   content.gsub(/^#{first_line_indent}/, '')
 end
 
-def xdry gens, content
+def xdry gens, content=nil
+  if content.nil?
+    content = gens
+    gens = nil
+  end
+
   config = XDry::Config.new
   config.verbose = ((ENV['VERBOSE'] || '0').to_i != 0)
 
-  gens = [gens] if gens.is_a?(Symbol)
-  config.enable_only = gens.collect { |g| g.to_s.gsub('_', '-') }
+  unless gens.nil?
+    gens = [gens] if gens.is_a?(Symbol)
+    config.enable_only = gens.collect { |g| g.to_s.gsub('_', '-') }
+  end
 
   first_line_indent = content.split("\n", 2).first.gsub(/\S.*$/, '')
   deleted_indent    = first_line_indent.sub(/\s\s$/, '-( |$)')
