@@ -40,7 +40,7 @@ module XDry
 
     def initialize
       self.only = nil
-      self.dry_run = true
+      self.dry_run = false
       self.watch = false
       self.verbose = false
       self.disable = []
@@ -106,10 +106,7 @@ module XDry
           opts.separator ""
           opts.separator "Patching options:"
 
-          opts.on("-R", "--real", "Really apply changes to your files (opposite of -n)") do |v|
-            config.dry_run = false
-          end
-          opts.on("-n", "--dry-run", "Save changed files as .xdry.{h/m}. Default for now.") do |v|
+          opts.on("-n", "--dry-run", "Save changed files as .xdry.{h/m}") do |v|
             config.dry_run = true
           end
 
