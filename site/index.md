@@ -80,7 +80,7 @@ Automatic Changes
 Without any instructions from your side, XD.R.Y. automatically applies the following
 changes:
 
-* Adds missing release calls from `dealloc` methods:
+* Adds missing release calls to `dealloc` methods:
 
 {% example %}
 
