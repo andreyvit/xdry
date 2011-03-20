@@ -10,7 +10,7 @@ begin
         Autogenerates all kinds of funky stuff (like accessors) in Xcode projects
     }.strip
     gem.email = "andreyvit@gmail.com"
-    gem.homepage = "http://github.com/mockko/xdry"
+    gem.homepage = "http://andreyvit.github.com/xdry/"
     gem.authors = ["Andrey Tarantsov"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
     # http://www.rubygems.org/read/chapter/20
