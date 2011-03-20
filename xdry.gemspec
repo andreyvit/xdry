@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xdry}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrey Tarantsov"]
@@ -71,7 +71,7 @@ Gem::Specification.new do |s|
     "spec/synthesize_spec.rb",
     "xdry.gemspec"
   ]
-  s.homepage = %q{http://github.com/mockko/xdry}
+  s.homepage = %q{http://andreyvit.github.com/xdry/}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{eXtra D.R.Y. for Xcode}
