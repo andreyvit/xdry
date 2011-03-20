@@ -1,33 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset='utf-8'>
-
-  <title>andreyvit/xdry @ GitHub</title>
-
-  <style type="text/css">
-    body {
-      margin-top: 1.0em;
-      background-color: #ffffff;
-      font-family: Helvetica, Arial, FreeSans, san-serif;
-      color: #000000;
-    }
-    #container {
-      margin: 0 auto;
-      width: 700px;
-    }
-    h1 { font-size: 3.8em; color: #000000; margin-bottom: 3px; }
-    h1 .small { font-size: 0.4em; }
-    h1 a { text-decoration: none }
-    h2 { font-size: 1.5em; color: #000000; }
-    h3 { text-align: center; color: #000000; }
-    a { color: #000000; }
-    .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
-    .download { float: right; }
-    pre { background: #000; color: #fff; padding: 15px;}
-    hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
-    .footer { text-align:center; padding-top:30px; font-style: italic; }
-  </style>
+  <meta charset="utf-8">
+  <title>Objective-C boilerplate generator — Extra DRY</title>
+  <link href='http://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=PT+Serif' rel='stylesheet' type='text/css'>
+  <link href="master.css" rel="stylesheet" type="text/css" media="screen" charset="utf-8">
 </head>
 
 <body>
@@ -35,49 +13,314 @@
 
   <div id="container">
 
-    <div class="download">
-      <a href="http://github.com/andreyvit/xdry/zipball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/zip.png"></a>
-      <a href="http://github.com/andreyvit/xdry/tarball/master">
-        <img border="0" width="90" src="http://github.com/images/modules/download/tar.png"></a>
-    </div>
+    <h1 id='objectivec_boilerplate_generator'>Objective-C boilerplate generator</h1>
 
-    <h1><a href="http://github.com/andreyvit/xdry">xdry</a>
-      <span class="small">by <a href="http://github.com/andreyvit">andreyvit</a></span></h1>
+<p>Run Extra D.R.Y. in your Objective-C project folder to automatically add (upon your request):</p>
 
-    <div class="description">
-      Extra DRY: Objective-C boilerplate autogenerator
-    </div>
+<ul>
+<li><code>@property</code>, <code>@synthesize</code>, field declarations,</li>
 
-    <p>Run `xdry` in your Objective-C project folder to automatically add properties, fields,
-constructors, release calls and more.
+<li>initializing constructors,</li>
 
-Declare and implement properties automatically:
-</p><h2>Install</h2>
-<p>    sudo gem install xdry
-</p>
-<h2>License</h2>
-<p>MIT License</p>
-<h2>Authors</h2>
-<p>Andrey Tarantsov (andreyvit@gmail.com)<br/><br/>      </p>
-<h2>Contact</h2>
-<p>Andrey Tarantsov (andreyvit@gmail.com)<br/>      </p>
+<li>missing release calls in dealloc,</li>
+
+<li>initWithDictionary, dictionaryRepresentation based on the chosen fields.</li>
+</ul>
+
+<h2 id='installation'>Installation</h2>
+
+<p>Install the command-line utility via RubyGems:</p>
+
+<pre><code>sudo gem install xdry</code></pre>
+
+<h2 id='basic_usage'>Basic Usage</h2>
+
+<p>Tell XD.R.Y. which changes you want done using bang-commands. For example, add <code>!p</code> to a field declaration line to generate a property:</p>
+<div class='example'>
 
 
-    <h2>Download</h2>
-    <p>
-      You can download this project in either
-      <a href="http://github.com/andreyvit/xdry/zipball/master">zip</a> or
-      <a href="http://github.com/andreyvit/xdry/tarball/master">tar</a> formats.
-    </p>
-    <p>You can also clone the project with <a href="http://git-scm.com">Git</a>
-      by running:
-      <pre>$ git clone git://github.com/andreyvit/xdry</pre>
-    </p>
+<div class='highlight'><pre><code class='objc'><span class='c1'>// Foo.h</span>
+<span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>value</span><span class='p'>;</span> <span class='o'>!</span><span class='n'>p</span>
+<span class='p'>}</span>
 
-    <div class="footer">
-      get the source code on GitHub : <a href="http://github.com/andreyvit/xdry">andreyvit/xdry</a>
-    </div>
+<span class='k'>@end</span>
+
+<span class='c1'>// Foo.m</span>
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+
+<div class='highlight'><pre><code class='objc'><span class='c1'>// Foo.h</span>
+<span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>value</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='k'>@property</span><span class='p'>(</span><span class='n'>nonatomic</span><span class='p'>,</span> <span class='n'>retain</span><span class='p'>)</span> <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>value</span><span class='p'>;</span>
+
+<span class='k'>@end</span>
+
+<span class='c1'>// Foo.m</span>
+<span class='k'>@implementation</span> <span class='nc'>Foo</span>
+
+<span class='k'>@synthesize</span> <span class='n'>value</span><span class='p'>;</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>void</span><span class='p'>)</span><span class='n'>dealloc</span> <span class='p'>{</span>
+  <span class='p'>[</span><span class='n'>value</span> <span class='n'>release</span><span class='p'>],</span> <span class='n'>value</span> <span class='o'>=</span> <span class='nb'>nil</span><span class='p'>;</span>
+  <span class='p'>[</span><span class='n'>super</span> <span class='n'>dealloc</span><span class='p'>];</span>
+<span class='p'>}</span>
+
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+</div>
+<p>To run XD.R.Y., open a Terminal, cd to your project folder and execute <code>xdry</code>:</p>
+
+<pre><code>cd ~/Documents/HelloWorld
+xdry</code></pre>
+
+<h2 id='properties_fields_constructors'>Properties, Fields, Constructors</h2>
+
+<p><code>!p</code> — generate a property for the given field:</p>
+<div class='example'>
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>value</span><span class='p'>;</span> <span class='o'>!</span><span class='n'>p</span>
+<span class='p'>}</span>
+
+<span class='k'>@end</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>value</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='k'>@property</span><span class='p'>(</span><span class='n'>nonatomic</span><span class='p'>,</span> <span class='n'>retain</span><span class='p'>)</span> <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>value</span><span class='p'>;</span>
+
+<span class='k'>@end</span>
+
+<span class='k'>@implementation</span> <span class='nc'>Foo</span>
+
+<span class='k'>@synthesize</span> <span class='n'>value</span><span class='p'>;</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>void</span><span class='p'>)</span><span class='n'>dealloc</span> <span class='p'>{</span>
+  <span class='p'>[</span><span class='n'>value</span> <span class='n'>release</span><span class='p'>],</span> <span class='n'>value</span> <span class='o'>=</span> <span class='nb'>nil</span><span class='p'>;</span>
+  <span class='p'>[</span><span class='n'>super</span> <span class='n'>dealloc</span><span class='p'>];</span>
+<span class='p'>}</span>
+
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+</div>
+<p><code>!c</code> — generate an initializing constructor for the given field(s):</p>
+<div class='example'>
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='n'>NSString</span> <span class='o'>*</span><span class='n'>_something</span><span class='p'>;</span> <span class='o'>!</span><span class='n'>c</span>
+<span class='p'>}</span>
+<span class='k'>@end</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='n'>NSString</span> <span class='o'>*</span><span class='n'>_something</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>id</span><span class='p'>)</span><span class='nl'>initWithSomething:</span><span class='p'>(</span><span class='n'>NSString</span> <span class='o'>*</span><span class='p'>)</span><span class='n'>something</span><span class='p'>;</span>
+
+<span class='k'>@end</span>
+
+<span class='k'>@implementation</span> <span class='nc'>Foo</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>id</span><span class='p'>)</span><span class='nl'>initWithSomething:</span><span class='p'>(</span><span class='n'>NSString</span> <span class='o'>*</span><span class='p'>)</span><span class='n'>something</span> <span class='p'>{</span>
+  <span class='k'>if</span> <span class='p'>(</span><span class='n'>self</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>super</span> <span class='n'>init</span><span class='p'>])</span> <span class='p'>{</span>
+    <span class='n'>_something</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>something</span> <span class='n'>copy</span><span class='p'>];</span>
+  <span class='p'>}</span>
+  <span class='k'>return</span> <span class='n'>self</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+</div>
+<h2 id='dictionary_coding'>Dictionary Coding</h2>
+
+<p>XD.R.Y. can generate <code>initWithDictionary:(NSDictionary *)dictionary</code> method, useful for loading objects from a plist. Similarly, an <code>(NSDictionary *)dictionaryRepresentation</code> method is generated to produce a plist-friendly dictionary from an object.</p>
+
+<p><code>// persistent</code> marks a block of fields to read from a dictionary / serialize into a dictionary:</p>
+<div class='example'>
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='c1'>// persistent</span>
+  <span class='n'>NSString</span> <span class='o'>*</span><span class='n'>_something</span><span class='p'>;</span>
+<span class='p'>}</span>
+<span class='k'>@end</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='c1'>// persistent</span>
+  <span class='n'>NSString</span> <span class='o'>*</span><span class='n'>_something</span><span class='p'>;</span>
+<span class='p'>}</span>
+<span class='k'>@end</span>
+
+<span class='cp'>#define SomethingKey @&quot;Something&quot;</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>id</span><span class='p'>)</span><span class='nl'>initWithDictionary:</span><span class='p'>(</span><span class='n'>NSDictionary</span> <span class='o'>*</span><span class='p'>)</span><span class='n'>dictionary</span> <span class='p'>{</span>
+  <span class='k'>if</span> <span class='p'>(</span><span class='n'>self</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>super</span> <span class='n'>init</span><span class='p'>])</span> <span class='p'>{</span>
+    <span class='kt'>id</span> <span class='n'>somethingRaw</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>dictionary</span> <span class='nl'>objectForKey:</span><span class='n'>SomethingKey</span><span class='p'>];</span>
+    <span class='k'>if</span> <span class='p'>(</span><span class='n'>somethingRaw</span> <span class='o'>!=</span> <span class='nb'>nil</span><span class='p'>)</span> <span class='p'>{</span>
+      <span class='n'>_something</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>somethingRaw</span> <span class='n'>copy</span><span class='p'>];</span>
+    <span class='p'>}</span>
+  <span class='p'>}</span>
+  <span class='k'>return</span> <span class='n'>self</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='n'>NSDictionary</span> <span class='o'>*</span><span class='p'>)</span><span class='n'>dictionaryRepresentation</span> <span class='p'>{</span>
+  <span class='n'>NSMutableDictionary</span> <span class='o'>*</span><span class='n'>dictionary</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>NSMutableDictionary</span> <span class='n'>dictionary</span><span class='p'>];</span>
+  <span class='p'>[</span><span class='n'>dictionary</span> <span class='nl'>setObject:</span><span class='n'>_something</span> <span class='nl'>forKey:</span><span class='n'>SomethingKey</span><span class='p'>];</span>
+  <span class='k'>return</span> <span class='n'>dictionary</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+</div>
+<p>To correctly handle serialization and deserialization of arrays, you need to hint XD.R.Y. about the item type:</p>
+<div class='example'>
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='c1'>// persistent</span>
+  <span class='n'>NSArray</span> <span class='o'>*</span><span class='n'>_bars</span><span class='p'>;</span> <span class='c1'>// of Bar</span>
+<span class='p'>}</span>
+<span class='k'>@end</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+
+<div class='highlight'><pre><code class='objc'><span class='k'>@interface</span> <span class='nc'>Foo</span> <span class='p'>{</span>
+  <span class='c1'>// persistent</span>
+  <span class='n'>NSArray</span> <span class='o'>*</span><span class='n'>_bars</span><span class='p'>;</span> <span class='c1'>// of Bar</span>
+<span class='p'>}</span>
+<span class='k'>@end</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+<span class='cp'>#define BarsKey @&quot;Bars&quot;</span>
+
+<span class='err'>@</span><span class='n'>implementation</span> <span class='n'>Foo</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>id</span><span class='p'>)</span><span class='nl'>initWithDictionary:</span><span class='p'>(</span><span class='n'>NSDictionary</span> <span class='o'>*</span><span class='p'>)</span><span class='n'>dictionary</span> <span class='p'>{</span>
+  <span class='k'>if</span> <span class='p'>(</span><span class='n'>self</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>super</span> <span class='n'>init</span><span class='p'>])</span> <span class='p'>{</span>
+    <span class='kt'>id</span> <span class='n'>barsRaw</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>dictionary</span> <span class='nl'>objectForKey:</span><span class='n'>BarsKey</span><span class='p'>];</span>
+    <span class='k'>if</span> <span class='p'>(</span><span class='n'>barsRaw</span> <span class='o'>!=</span> <span class='nb'>nil</span><span class='p'>)</span> <span class='p'>{</span>
+      <span class='n'>NSMutableArray</span> <span class='o'>*</span><span class='n'>barsArray</span> <span class='o'>=</span> <span class='p'>[[</span><span class='n'>NSMutableArray</span> <span class='n'>alloc</span><span class='p'>]</span> <span class='n'>init</span><span class='p'>];</span>
+      <span class='k'>for</span> <span class='p'>(</span><span class='n'>NSDictionary</span> <span class='o'>*</span><span class='n'>barsItemDict</span> <span class='k'>in</span> <span class='p'>(</span><span class='n'>NSArray</span> <span class='o'>*</span><span class='p'>)</span> <span class='n'>barsRaw</span><span class='p'>)</span> <span class='p'>{</span>
+        <span class='n'>Bar</span> <span class='o'>*</span><span class='n'>barsItem</span> <span class='o'>=</span> <span class='p'>[[</span><span class='n'>Bar</span> <span class='n'>alloc</span><span class='p'>]</span> <span class='nl'>initWithDictionary:</span><span class='n'>barsItemDict</span><span class='p'>];</span>
+        <span class='p'>[</span><span class='n'>barsArray</span> <span class='nl'>addObject:</span><span class='n'>barsItem</span><span class='p'>];</span>
+        <span class='p'>[</span><span class='n'>barsItem</span> <span class='n'>release</span><span class='p'>];</span>
+      <span class='p'>}</span>
+      <span class='n'>_bars</span> <span class='o'>=</span> <span class='n'>barsArray</span><span class='p'>;</span>
+    <span class='p'>}</span>
+  <span class='p'>}</span>
+  <span class='k'>return</span> <span class='n'>self</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='n'>NSDictionary</span> <span class='o'>*</span><span class='p'>)</span><span class='n'>dictionaryRepresentation</span> <span class='p'>{</span>
+  <span class='n'>NSMutableDictionary</span> <span class='o'>*</span><span class='n'>dictionary</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>NSMutableDictionary</span> <span class='n'>dictionary</span><span class='p'>];</span>
+  <span class='n'>NSMutableArray</span> <span class='o'>*</span><span class='n'>barsArray</span> <span class='o'>=</span> <span class='p'>[</span><span class='n'>NSMutableArray</span> <span class='n'>array</span><span class='p'>];</span>
+  <span class='k'>for</span> <span class='p'>(</span><span class='n'>Bar</span> <span class='o'>*</span><span class='n'>barsItem</span> <span class='k'>in</span> <span class='n'>_bars</span><span class='p'>)</span> <span class='p'>{</span>
+    <span class='p'>[</span><span class='n'>barsArray</span> <span class='nl'>addObject:</span><span class='p'>[</span><span class='n'>barsItem</span> <span class='n'>dictionaryRepresentation</span><span class='p'>]];</span>
+  <span class='p'>}</span>
+  <span class='p'>[</span><span class='n'>dictionary</span> <span class='nl'>setObject:</span><span class='n'>barsArray</span> <span class='nl'>forKey:</span><span class='n'>BarsKey</span><span class='p'>];</span>
+  <span class='k'>return</span> <span class='n'>dictionary</span><span class='p'>;</span>
+<span class='p'>}</span>
+
+<span class='o'>-</span> <span class='p'>(</span><span class='kt'>void</span><span class='p'>)</span><span class='n'>dealloc</span> <span class='p'>{</span>
+  <span class='p'>[</span><span class='n'>_bars</span> <span class='n'>release</span><span class='p'>],</span> <span class='n'>_bars</span> <span class='o'>=</span> <span class='nb'>nil</span><span class='p'>;</span>
+  <span class='p'>[</span><span class='n'>super</span> <span class='n'>dealloc</span><span class='p'>];</span>
+<span class='p'>}</span>
+
+<span class='k'>@end</span>
+</code></pre>
+</div>
+
+
+</div>
+<h2 id='license_and_authors'>License and Authors</h2>
+
+<p>Copyright 2010–2011, Andrey Tarantsov.</p>
+
+<p>Distributed under the MIT license, see LICENSE file for details.</p>
+
+<h2 id='contributing'>Contributing</h2>
+
+<p>Fork the source on GitHub: <a href='http://github.com/andreyvit/xdry'>http://github.com/andreyvit/xdry</a>.</p>
+
+<p>Add a test, make a change, verify that all tests pass, update the docs in site/index.md, send me a pull request.</p>
+
+<p>Testing prerequisites:</p>
+
+<pre><code>sudo gem install rake rspec diff-lcs</code></pre>
+
+<p>The simplest way to run the tests:</p>
+
+<pre><code>rake</code></pre>
+
+<p>Get a nice colorful table with test results:</p>
+
+<pre><code>rspec -b -c -fd .</code></pre>
+
+<p>When something goes wrong, you want a verbose output:</p>
+
+<pre><code>VERBOSE=1 rake</code></pre>
+
+<p>Site (documentation) prerequisites:</p>
+
+<pre><code>sudo gem install jekyll
+sudo easy_install Pygments</code></pre>
+
+<p>Regenerate the site using:</p>
+
+<pre><code>rake site:build</code></pre>
+
+<p>(open site/_site/index.html to view the results). Don&#8217;t bother with gh-pages branch.</p>
 
   </div>
 

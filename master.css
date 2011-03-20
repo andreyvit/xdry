@@ -1,0 +1,22 @@
+/* @override file:///Users/andreyvit/Dropbox/projects/active/xdry-pages/_site/master.css */
+
+* { margin: 0px; padding: 0px; }
+
+#container { margin: 0 auto; width: 700px; }
+
+body { margin: 50px 20px; font: 16px 'PT Serif', arial, sans-serif; line-height: 24px; background: #fff; color: #222; }
+
+h1, h2 { font-family: 'Pacifico', arial, sans-serif; color: #333; }
+h1 { font-size: 40px; margin: 0px 0px 40px; line-height: 56px; }
+h2 { font-size: 24px; margin: 30px 0px 0px; line-height: 42px; }
+
+p { margin: 10px 0px 0px; }
+
+ul { margin: 10px 0px; }
+li { list-style-position: inside; }
+
+pre { background: #f0f0ff; border: 1px solid #000; color: #000; margin: 20px 0px; padding: 12px 20px; font: 14px Monaco, Menlo, monospace; line-height: 15px; }
+
+a { color: #222; }
+a:visited { color: #666; }
+a:hover { color: #000; }
