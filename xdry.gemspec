@@ -68,7 +68,8 @@ Gem::Specification.new do |s|
     "spec/readme_samples_spec.rb",
     "spec/spec.opts",
     "spec/spec_helper.rb",
-    "spec/synthesize_spec.rb"
+    "spec/synthesize_spec.rb",
+    "xdry.gemspec"
   ]
   s.homepage = %q{http://github.com/mockko/xdry}
   s.require_paths = ["lib"]
