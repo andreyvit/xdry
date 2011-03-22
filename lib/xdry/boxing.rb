@@ -55,6 +55,19 @@ module XDry
       end
     end
 
+    module UNKNOWN
+      def self.retain expr
+        "[#{expr} retain]"
+      end
+
+      def self.release out, expr
+        out << "[#{expr} release]";
+      end
+
+      def self.release_and_clear out, var_name
+      end
+    end
+
   end
 
   module Boxing
@@ -203,6 +216,8 @@ module XDry
           when PointerVarType then RetainPolicy::RETAIN
           when IdVarType      then RetainPolicy::ASSIGN_REF
           when SimpleVarType  then RetainPolicy::ASSIGN_VALUE
+          when UnknownVarType then RetainPolicy::UNKNOWN
+          when PointerPointerVarType then RetainPolicy::RETAIN
         end
       end
     end

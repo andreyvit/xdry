@@ -36,4 +36,21 @@ describe "property from field generator" do
     END
   end
 
+  it "should add a property for a field with unknown type" do
+    xdry :prop_from_field, <<-END
+      @interface Foo {
+    -   Blah Blah __const __attribute((WOWWW!!!! 111 22) _something; !p
+    +   Blah Blah __const __attribute((WOWWW!!!! 111 22) _something;
+      }
+
+    + @property(nonatomic, retain) Blah Blah __const __attribute((WOWWW!!!! 111 22) something;
+    +
+      @end
+
+      @implementation Foo
+
+      @end
+    END
+  end
+
 end
