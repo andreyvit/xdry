@@ -2,6 +2,18 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe "dealloc support" do
 
+  it "shouldn't add dealloc when it is not needed" do
+    xdry :dealloc, <<-END
+      @interface Foo {
+        int something;
+      }
+      @end
+
+      @implementation Foo
+      @end
+    END
+  end
+
   it "should add missing release calls to dealloc" do
     xdry :dealloc, <<-END
       @interface Foo {

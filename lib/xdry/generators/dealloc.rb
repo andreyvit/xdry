@@ -14,6 +14,9 @@ module Generators
     id "dealloc"
 
     def process_class oclass
+      # avoid generation of empty deallocs
+      lines = generate_release_calls_if(oclass) { true }
+      return if lines.empty?
 
       MethodPatcher.new(patcher, oclass, 'dealloc', ImplementationStartIP.new(oclass), DEALLOC_CODE) do |dealloc_method|
         impl = dealloc_method.impl
