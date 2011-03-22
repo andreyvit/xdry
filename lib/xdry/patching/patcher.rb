@@ -131,7 +131,7 @@ module XDry
     end
 
     def load_lines_of file_ref
-      file_ref.read.lines.collect
+      file_ref.read.lines.collect.to_a
     end
 
   end

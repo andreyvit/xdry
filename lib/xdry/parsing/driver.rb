@@ -1,4 +1,9 @@
-require 'generator'
+begin
+  require 'generator'
+rescue LoadError
+  Generator = Enumerator
+end
+
 require 'stringio'
 
 module XDry
@@ -47,8 +52,8 @@ module XDry
     def parse_data_in_scopes gen, scopes
       scope_stack = ScopeStack.new(scopes)
       scope_stack.verbose = @verbose
-      while gen.next?
-        orig_line, line, pos, eol_comments, indent = gen.next
+      while data = gen.next
+        orig_line, line, pos, eol_comments, indent = data
         puts "        #{pos} #{orig_line}" if @verbose
         pos.scope_before = scope_stack.current_scope
         scope_stack.parse_line line, eol_comments, indent do |scope, child|
@@ -66,6 +71,8 @@ module XDry
         end
         pos.scope_after = scope_stack.current_scope
       end
+    rescue EOFError, StopIteration
+      #
     end
 
     def new_lines_generator g, file_ref, io
