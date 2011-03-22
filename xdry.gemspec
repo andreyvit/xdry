@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{xdry}
-  s.version = "0.1.1"
+  s.version = "0.1.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Andrey Tarantsov"]
-  s.date = %q{2011-03-20}
+  s.date = %q{2011-03-22}
   s.default_executable = %q{xdry}
   s.description = %q{Autogenerates all kinds of funky stuff (like accessors) in Xcode projects}
   s.email = %q{andreyvit@gmail.com}
@@ -66,14 +66,17 @@ Gem::Specification.new do |s|
     "spec/field_from_prop_spec.rb",
     "spec/prop_from_field_spec.rb",
     "spec/readme_samples_spec.rb",
+    "spec/selector_parsing_spec.rb",
     "spec/spec.opts",
     "spec/spec_helper.rb",
     "spec/synthesize_spec.rb",
+    "spec/unknown_stuff_handling_spec.rb",
+    "spec/vartype_parsing_spec.rb",
     "xdry.gemspec"
   ]
   s.homepage = %q{http://andreyvit.github.com/xdry/}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
+  s.rubygems_version = %q{1.6.2}
   s.summary = %q{eXtra D.R.Y. for Xcode}
   s.test_files = [
     "spec/boxing_spec.rb",
@@ -83,12 +86,14 @@ Gem::Specification.new do |s|
     "spec/field_from_prop_spec.rb",
     "spec/prop_from_field_spec.rb",
     "spec/readme_samples_spec.rb",
+    "spec/selector_parsing_spec.rb",
     "spec/spec_helper.rb",
-    "spec/synthesize_spec.rb"
+    "spec/synthesize_spec.rb",
+    "spec/unknown_stuff_handling_spec.rb",
+    "spec/vartype_parsing_spec.rb"
   ]
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
