@@ -1,3 +1,4 @@
+require 'strscan'
 
 module XDry
 
@@ -8,15 +9,32 @@ module XDry
       if string =~ /^\w+$/
         SimpleSelectorDef.new(string)
       else
-        comps = string.split(/\s+(?!\*)/).collect do |component_string|
-          if component_string =~ /^(\w+:)\s*(?:\(([^)]+)\)\s*)?(\w*)$/
-            keyword, type_decl, arg_name = $1, $2, $3
-            type = if type_decl then VarType.parse(type_decl) else nil end
-            SelectorComponent.new(keyword, arg_name, type)
+        ss = StringScanner.new(string)
+        comps = []
+        while not ss.eos?
+          keyword = ss.scan(/\w+\s*:/) or raise(StandardError, "Cannot parse selector '#{string}': keyword expected at '#{ss.rest}'")
+          keyword = keyword.gsub(/\s/, '')
+
+          ss.skip(/\s+/)
+          if ss.skip(/\(/)
+            res = ss.scan_until(/\)/) or raise(StandardError, "Cannot parse selector '#{string}': missing closing paren at '#{ss.rest}'")
+            type_decl = res[0..-2].strip
           else
-            raise StandardError, "Cannot parse selector component '#{component_string}' for selector '#{string}'"
+            type_decl = nil
           end
+
+          ss.skip(/\s+/)
+          unless ss.match?(/\w+\s*:/)
+            arg_name = ss.scan(/\w+/)
+          else
+            arg_name = nil
+          end
+          ss.skip(/\s+/)
+
+          type = if type_decl then VarType.parse(type_decl) else nil end
+          comps << SelectorComponent.new(keyword, arg_name, type)
         end
+
         CompoundSelectorDef.new(comps)
       end
     end
